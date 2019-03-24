@@ -1,0 +1,6 @@
+
+# show 2018 workflows
+runTheMatrix.py -n | grep 2018
+
+# printout 10871.0 workflow
+runTheMatrix -l 10871.0 --dryRun
