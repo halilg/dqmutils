@@ -7,9 +7,11 @@
 * Step_2: several warnings, probably because some inputs are missing in the output of Step_1 (in which only one DQM sequence is run).
   Example warning:
 ```
+%MSG-e endRun:  TauDQMHistEffProducer:efficienciesRealMuonsDataSummary@endJob  24-Mar-2019 20:24:01 CET PostGlobalEndRun
+  denominator = RecoTauV/hpsPFTauProducerRealMuonsData_Summary/summaryPlotDen does not exist.
 %MSG
-%MSG-e endRun:  TauDQMHistEffProducer:efficienciesRealElectronsData@endJob  24-Mar-2019 16:08:24 CET PostGlobalEndRun
-  denominator = RecoTauV/hpsPFTauProducerRealElectronsData_ReferenceCollection/nRef_Taus_vs_etaTauVisible does not exist.
+%MSG-e DQMGenericClient:  DQMGenericClient:trackingEffFromHitPatternHLT@endJob  24-Mar-2019 20:24:01 CET PostGlobalEndRun
+ DQMGenericClient::findAllSubdirectories ==> Missing folder HLT/Tracking/pixelTracks !!!
 ```
 
 -----------------------------------------------
