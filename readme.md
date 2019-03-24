@@ -2,7 +2,7 @@
 * create DQM .root file (DQM+Harvesting)
 
 ```
-./DQM_test01.sh
+./DQM_test01.sh [CMSRUN_OUTPUT_DIR]
 ```
 
 --------------------------------------------------
