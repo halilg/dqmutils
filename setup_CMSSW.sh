@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 if   [ $(basename ${SHELL}) = "bash" ]; then BASE_DIR=$(dirname $(readlink -f ${BASH_SOURCE}))
 elif [ $(basename ${SHELL}) = "zsh"  ]; then BASE_DIR=$(dirname $(readlink -f $0))

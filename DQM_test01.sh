@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # --- Step_1: DQM
 if [ ! -f ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8_DQM.root ]; then
@@ -43,6 +43,8 @@ if [ -f ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8_DQM.root ]; then
    -n -1 || exit $? ;
 
   cmsRun ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8_Harvesting_cfg.py
+
+# output: DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO.root
 fi
 
 # --------------
