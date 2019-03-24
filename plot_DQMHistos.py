@@ -76,6 +76,9 @@ if __name__ == '__main__':
     EXTS = list(set(opts.exts))
 
     ONLY_KEYS = list(set(opts.only_keys))
+
+    if len(ONLY_KEYS):
+       print '\n >>> will plot only TH1 objects containing all of the following strings in their internal path:', ONLY_KEYS, '\n'
     ### -------------------
 
     ### input histograms --
@@ -136,7 +139,7 @@ if __name__ == '__main__':
 
             canvas.SaveAs(out_file)
 
-            print '\033[1m'+'\033[92m'+'[output]'+'\033[0m', out_file
+            print '\033[1m'+'\033[92m'+'[output]'+'\033[0m', os.path.relpath(out_file)
 
         canvas.Close()
     ### -------------------
