@@ -1,5 +1,22 @@
 #!/bin/sh
 
+if [ $# -ne 1 ]; then
+
+  printf "\n%s\n\n" " >>> ERROR -- one input argument required (path to output directory)"
+  exit 1
+fi
+
+OUTPUT_DIR="$1"
+
+if [ -d ${OUTPUT_DIR} ]; then
+
+  printf "\n%s\n\n" " >>> ERROR -- target output directory already exists: ${OUTPUT_DIR}"
+  exit 1
+fi
+
+mkdir -p ${OUTPUT_DIR}
+cd       ${OUTPUT_DIR}
+
 AOD_INPUT=/store/mc/RunIIAutumn18DRPremix/ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8/AODSIM/102X_upgrade2018_realistic_v15-v1/270000/87EF3D51-5441-2F49-A2BC-54C446667ACD.root
 
 OUTPUT_TAG=ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8
@@ -64,6 +81,7 @@ fi
 # --------------
 
 unset -v AOD_INPUT
+unset -v OUTPUT_DIR
 unset -v OUTPUT_TAG
 unset -v STEP1_OUTPUT
 unset -v STEP1_CFG_PY
