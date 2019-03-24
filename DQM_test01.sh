@@ -32,7 +32,7 @@ if [ ! -f ${STEP1_OUTPUT} ]; then
 
 else
 
-  printf "\n%s\n" " >>> WARNING -- skipped Step_1 , target output file already exists: ${STEP1_OUTPUT}"
+  printf "\n%s\n\n" " >>> WARNING -- skipped Step_1 , target output file already exists: ${STEP1_OUTPUT}"
 fi
 
 # --------------
@@ -58,7 +58,7 @@ if [ -f ${STEP1_OUTPUT} ]; then
 
 else
 
-  printf "\n%s\n" " >>> WARNING -- skipped Step_2 , target input file does not exist: ${STEP1_OUTPUT}"
+  printf "\n%s\n\n" " >>> WARNING -- skipped Step_2 , target input file not found: ${STEP1_OUTPUT}"
 fi
 
 # --------------
