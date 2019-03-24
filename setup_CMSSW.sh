@@ -1,16 +1,16 @@
 #!/bin/bash
 
-if   [ $(basename ${SHELL}) == "bash" ]; then BASE_DIR=$(dirname $(readlink -f ${BASH_SOURCE}))
-elif [ $(basename ${SHELL}) == "zsh"  ]; then BASE_DIR=$(dirname $(readlink -f $0))
+if   [ $(basename ${SHELL}) = "bash" ]; then BASE_DIR=$(dirname $(readlink -f ${BASH_SOURCE}))
+elif [ $(basename ${SHELL}) = "zsh"  ]; then BASE_DIR=$(dirname $(readlink -f $0))
 else
 
   printf "\n%s\n\n" " >>> WARNING -- unsupported type of shell: ${SHELL}"
   return
 fi
 
-if [ ! -f ${BASE_DIR}/setup.sh ]; then
+if [ ! -f ${BASE_DIR}/setup_CMSSW.sh ]; then
 
-  printf "\n%s\n\n" " >>> ERROR -- invalid path to directory containing setup.sh script: \"${BASE_DIR}\""
+  printf "\n%s\n\n" " >>> ERROR -- invalid path to directory containing setup_CMSSW.sh script: \"${BASE_DIR}\""
   unset -v BASE_DIR
   return
 fi
@@ -30,6 +30,9 @@ unset -v CMSSW_rel
 # cmsenv
 eval `scram runtime -sh`
 
+# voms
+voms-proxy-init --voms cms
+
 # DQM step
 if [ ! -d DQMOffline/Trigger ]; then git cms-addpkg DQMOffline/Trigger; fi;
 
@@ -38,7 +41,5 @@ if [ ! -d HLTriggerOffline ]; then git cms-addpkg HLTriggerOffline; fi;
 
 scram b
 scram b
-
-voms-proxy-init --voms cms
 
 cd ${CMSSW_BASE}/..

@@ -1,0 +1,15 @@
+
+* Step_2: `--step HARVESTING:validationHarvesting+dqmHarvesting` fails because of `validationHarvesting`;
+  error is a segmentation-violation, probably because some inputs are missing in the output of Step_1.
+
+-----------------------------------------------
+
+* Step_2: several warnings, probably because some inputs are missing in the output of Step_1 (in which only one DQM sequence is run).
+  Example warning:
+```
+%MSG
+%MSG-e endRun:  TauDQMHistEffProducer:efficienciesRealElectronsData@endJob  24-Mar-2019 16:08:24 CET PostGlobalEndRun
+  denominator = RecoTauV/hpsPFTauProducerRealElectronsData_ReferenceCollection/nRef_Taus_vs_etaTauVisible does not exist.
+```
+
+-----------------------------------------------

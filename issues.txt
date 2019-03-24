@@ -1,6 +1,0 @@
-
-
-
-
-* Step_2: `--step HARVESTING:validationHarvesting+dqmHarvesting` fails because of `validationHarvesting`;
-  error is a segmentation-violation, probably because some inputs are missing in the output of Step_1.
