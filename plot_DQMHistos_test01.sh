@@ -10,3 +10,4 @@ if [ -f ${INPUT_FILE} ]; then
 fi
 
 unset -v INPUT_FILE
+unset -v OUTPUT_DIR

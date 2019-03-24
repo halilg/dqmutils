@@ -10,7 +10,7 @@
 * create figures from DQM histograms:
 
 ```
-./plot_DQMHistos.py -i [DQM_FILE].root -o [OUTPUT_DIR] -e png --only-keys '/DQM/'
+./plot_DQMHistos.py -i [DQM_FILE].root -o [OUTPUT_DIR] -e png --only-keys '/HLT/' '/TOP/'
 ```
 
 --------------------------------------------------
