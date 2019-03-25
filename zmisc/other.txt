@@ -1,0 +1,1 @@
+echo "\nopen('TEST.dump.py', 'w').write(process.dumpPython())\n" >> TEST.py
