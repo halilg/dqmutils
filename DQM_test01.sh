@@ -59,7 +59,7 @@ fi
 if [ -f ${STEP1_OUTPUT} ]; then
 
   cmsDriver.py step2 \
-   --step HARVESTING:dqmHarvesting --harvesting AtRunEnd \
+   --step HARVESTING:hltOfflineDQMClient --harvesting AtRunEnd \
    --filein     file:${STEP1_OUTPUT} \
    --python_filename ${STEP2_CFG_PY} \
    --filetype DQM \
