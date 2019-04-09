@@ -1,5 +1,7 @@
 #!/bin/sh
 
+set -e
+
 if [ $# -ne 1 ]; then
 
   printf "\n%s\n\n" " >>> ERROR -- one input argument required (path to output directory)"
@@ -17,9 +19,12 @@ fi
 mkdir -p ${OUTPUT_DIR}
 cd       ${OUTPUT_DIR}
 
-AOD_INPUT=/store/mc/RunIIAutumn18DRPremix/ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8/AODSIM/102X_upgrade2018_realistic_v15-v1/270000/87EF3D51-5441-2F49-A2BC-54C446667ACD.root
+#EDM_INPUT=/store/relval/CMSSW_10_6_0_pre2/RelValTTbar_13/GEN-SIM-RECO/PUpmx25ns_105X_upgrade2018_realistic_v6-v1/10000/B82E4EBC-7E5F-314C-B7BE-B44C418F244A.root
+DAS_SAMPLE=/RelValTTbar_13/CMSSW_10_6_0_pre2-PUpmx25ns_105X_upgrade2018_realistic_v6-v1/GEN-SIM-RECO
 
-OUTPUT_TAG=ttHTobb_ttTo2L2Nu_M125_TuneCP5_13TeV-powheg-pythia8
+dasgoclient --query "file dataset=${DAS_SAMPLE}" > inputs.txt
+
+OUTPUT_TAG=RelValTTbar_13_CMSSW_10_6_0_pre2-PUpmx25ns_105X_upgrade2018_realistic_v6
 
 STEP1_OUTPUT=${OUTPUT_TAG}_DQM.root
 STEP1_CFG_PY=${OUTPUT_TAG}_DQM_cfg.py
@@ -29,21 +34,21 @@ STEP2_CFG_PY=${OUTPUT_TAG}_Harvesting_cfg.py
 if [ ! -f ${STEP1_OUTPUT} ]; then
 
   cmsDriver.py step1 \
-   --step DQM:offlineValidationHLTSourceOnAOD \
-   --filein ${AOD_INPUT} \
-   --fileout    file:${STEP1_OUTPUT} \
+   --step DQM:offlineHLTSource4physicsPD \
+   --filein  filelist:inputs.txt \
+   --fileout         ${STEP1_OUTPUT} \
    --python_filename ${STEP1_CFG_PY} \
    --mc \
    --eventcontent DQM \
    --datatier DQMIO \
-   --conditions 102X_upgrade2018_realistic_v15 \
-   --geometry DB:Extended \
+   --conditions auto:phase1_2018_realistic \
    --era Run2_2018 \
+   --geometry DB:Extended \
    --nThreads 1 \
    --no_exec \
    --runUnscheduled \
    --customise Configuration/DataProcessing/Utils.addMonitoring \
-   -n 1000 || exit $? ;
+   -n -1 || exit $? ;
 
   cmsRun ${STEP1_CFG_PY}
 
@@ -65,9 +70,9 @@ if [ -f ${STEP1_OUTPUT} ]; then
    --filetype DQM \
    --mc \
    --scenario pp \
-   --conditions 102X_upgrade2018_realistic_v15 \
-   --geometry DB:Extended \
+   --conditions auto:phase1_2018_realistic \
    --era Run2_2018 \
+   --geometry DB:Extended \
    --no_exec \
    -n -1 || exit $? ;
 
@@ -80,7 +85,8 @@ fi
 
 # --------------
 
-unset -v AOD_INPUT
+#unset -v EDM_INPUT
+unset -v DAS_SAMPLE
 unset -v OUTPUT_DIR
 unset -v OUTPUT_TAG
 unset -v STEP1_OUTPUT
