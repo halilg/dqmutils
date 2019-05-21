@@ -1,32 +1,29 @@
 #!/usr/bin/env python
 """hlt_nanoAOD.py -- analyze HLT decisions in one NANOAOD file"""
 
-import argparse, os, glob, json, ROOT
+import argparse, os, json, ROOT
+
+LUMI_SECTION_TIME_SEC = 23.31
 
 def KILL(log):
     raise RuntimeError(log)
+
+def WARNING(log):
+    print(' [WARNING] '+log)
 
 def DecisionAndPurity(event, all_paths, paths):
 
     _pass = False
     _pure = False
 
-#    cohe = False
-#
-#    for i_path in all_paths:
-#        print getattr(evt, i_path), i_path
-#        if getattr(evt, i_path): cohe = True
-#
-#    print '!'*100, cohe
-
     for i_path in paths:
         if hasattr(evt, i_path) and (getattr(evt, i_path) == 1): _pass = True; break;
 
     if _pass:
 
-       _pure = True
+      _pure = True
 
-       for i_path in all_paths:
+      for i_path in all_paths:
 
            if i_path in paths: continue
 
@@ -34,180 +31,37 @@ def DecisionAndPurity(event, all_paths, paths):
 
     return _pass, _pure
 
-#from HLTConfiguration import *
-#HLT_paths = sorted(set(list(process.datasets.JetHT)))
-#HLT_paths = [_tmp[:_tmp.rfind('_v')] for _tmp in HLT_paths]
-
-HLT_paths = [
-
-  'HLT_AK8PFHT750_TrimMass50',
-  'HLT_AK8PFHT800_TrimMass50',
-  'HLT_AK8PFHT850_TrimMass50',
-  'HLT_AK8PFHT900_TrimMass50',
-  'HLT_AK8PFJet140',
-  'HLT_AK8PFJet15',
-  'HLT_AK8PFJet200',
-  'HLT_AK8PFJet25',
-  'HLT_AK8PFJet260',
-  'HLT_AK8PFJet320',
-  'HLT_AK8PFJet330_TrimMass30_PFAK8BTagDeepCSV_p17',
-  'HLT_AK8PFJet330_TrimMass30_PFAK8BTagDeepCSV_p1',
-  'HLT_AK8PFJet330_TrimMass30_PFAK8BoostedDoubleB_np2',
-  'HLT_AK8PFJet330_TrimMass30_PFAK8BoostedDoubleB_np4',
-  'HLT_AK8PFJet330_TrimMass30_PFAK8BoostedDoubleB_p02',
-  'HLT_AK8PFJet360_TrimMass30',
-  'HLT_AK8PFJet380_TrimMass30',
-  'HLT_AK8PFJet400_TrimMass30',
-  'HLT_AK8PFJet400',
-  'HLT_AK8PFJet40',
-  'HLT_AK8PFJet420_TrimMass30',
-  'HLT_AK8PFJet450',
-  'HLT_AK8PFJet500',
-  'HLT_AK8PFJet550',
-  'HLT_AK8PFJet60',
-  'HLT_AK8PFJet80',
-  'HLT_AK8PFJetFwd140',
-  'HLT_AK8PFJetFwd15',
-  'HLT_AK8PFJetFwd200',
-  'HLT_AK8PFJetFwd25',
-  'HLT_AK8PFJetFwd260',
-  'HLT_AK8PFJetFwd320',
-  'HLT_AK8PFJetFwd400',
-  'HLT_AK8PFJetFwd40',
-  'HLT_AK8PFJetFwd450',
-  'HLT_AK8PFJetFwd500',
-  'HLT_AK8PFJetFwd60',
-  'HLT_AK8PFJetFwd80',
-  'HLT_CaloJet500_NoJetID',
-  'HLT_CaloJet550_NoJetID',
-  'HLT_DiPFJetAve100_HFJEC',
-  'HLT_DiPFJetAve140',
-  'HLT_DiPFJetAve160_HFJEC',
-  'HLT_DiPFJetAve200',
-  'HLT_DiPFJetAve220_HFJEC',
-  'HLT_DiPFJetAve260',
-  'HLT_DiPFJetAve300_HFJEC',
-  'HLT_DiPFJetAve320',
-  'HLT_DiPFJetAve400',
-  'HLT_DiPFJetAve40',
-  'HLT_DiPFJetAve500',
-  'HLT_DiPFJetAve60_HFJEC',
-  'HLT_DiPFJetAve60',
-  'HLT_DiPFJetAve80_HFJEC',
-  'HLT_DiPFJetAve80',
-  'HLT_DoublePFJets100_CaloBTagDeepCSV_p71',
-  'HLT_DoublePFJets116MaxDeta1p6_DoubleCaloBTagDeepCSV_p71',
-  'HLT_DoublePFJets128MaxDeta1p6_DoubleCaloBTagDeepCSV_p71',
-  'HLT_DoublePFJets200_CaloBTagDeepCSV_p71',
-  'HLT_DoublePFJets350_CaloBTagDeepCSV_p71',
-  'HLT_DoublePFJets40_CaloBTagDeepCSV_p71',
-  'HLT_Mu12_DoublePFJets100_CaloBTagDeepCSV_p71',
-  'HLT_Mu12_DoublePFJets200_CaloBTagDeepCSV_p71',
-  'HLT_Mu12_DoublePFJets350_CaloBTagDeepCSV_p71',
-  'HLT_Mu12_DoublePFJets40MaxDeta1p6_DoubleCaloBTagDeepCSV_p71',
-  'HLT_Mu12_DoublePFJets40_CaloBTagDeepCSV_p71',
-  'HLT_Mu12_DoublePFJets54MaxDeta1p6_DoubleCaloBTagDeepCSV_p71',
-  'HLT_Mu12_DoublePFJets62MaxDeta1p6_DoubleCaloBTagDeepCSV_p71',
-  'HLT_PFHT1050',
-  'HLT_PFHT180',
-  'HLT_PFHT250',
-  'HLT_PFHT330PT30_QuadPFJet_75_60_45_40_TriplePFBTagDeepCSV_4p5',
-  'HLT_PFHT330PT30_QuadPFJet_75_60_45_40',
-  'HLT_PFHT350MinPFJet15',
-  'HLT_PFHT350',
-  'HLT_PFHT370',
-  'HLT_PFHT400_SixPFJet32_DoublePFBTagDeepCSV_2p94',
-  'HLT_PFHT400_SixPFJet32',
-  'HLT_PFHT430',
-  'HLT_PFHT450_SixPFJet36_PFBTagDeepCSV_1p59',
-  'HLT_PFHT450_SixPFJet36',
-  'HLT_PFHT500_PFMET100_PFMHT100_IDTight',
-  'HLT_PFHT500_PFMET110_PFMHT110_IDTight',
-  'HLT_PFHT510',
-  'HLT_PFHT590',
-  'HLT_PFHT680',
-  'HLT_PFHT700_PFMET85_PFMHT85_IDTight',
-  'HLT_PFHT700_PFMET95_PFMHT95_IDTight',
-  'HLT_PFHT780',
-  'HLT_PFHT800_PFMET75_PFMHT75_IDTight',
-  'HLT_PFHT800_PFMET85_PFMHT85_IDTight',
-  'HLT_PFHT890',
-  'HLT_PFJet140',
-  'HLT_PFJet15',
-  'HLT_PFJet200',
-  'HLT_PFJet25',
-  'HLT_PFJet260',
-  'HLT_PFJet320',
-  'HLT_PFJet400',
-  'HLT_PFJet40',
-  'HLT_PFJet450',
-  'HLT_PFJet500',
-  'HLT_PFJet550',
-  'HLT_PFJet60',
-  'HLT_PFJet80',
-  'HLT_PFJetFwd140',
-  'HLT_PFJetFwd15',
-  'HLT_PFJetFwd200',
-  'HLT_PFJetFwd25',
-  'HLT_PFJetFwd260',
-  'HLT_PFJetFwd320',
-  'HLT_PFJetFwd400',
-  'HLT_PFJetFwd40',
-  'HLT_PFJetFwd450',
-  'HLT_PFJetFwd500',
-  'HLT_PFJetFwd60',
-  'HLT_PFJetFwd80',
-  'HLT_QuadPFJet103_88_75_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1',
-  'HLT_QuadPFJet103_88_75_15_PFBTagDeepCSV_1p3_VBF2',
-  'HLT_QuadPFJet103_88_75_15',
-  'HLT_QuadPFJet105_88_76_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1',
-  'HLT_QuadPFJet105_88_76_15_PFBTagDeepCSV_1p3_VBF2',
-  'HLT_QuadPFJet105_88_76_15',
-  'HLT_QuadPFJet111_90_80_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1',
-  'HLT_QuadPFJet111_90_80_15_PFBTagDeepCSV_1p3_VBF2',
-  'HLT_QuadPFJet111_90_80_15',
-  'HLT_QuadPFJet98_83_71_15_DoublePFBTagDeepCSV_1p3_7p7_VBF1',
-  'HLT_QuadPFJet98_83_71_15_PFBTagDeepCSV_1p3_VBF2',
-  'HLT_QuadPFJet98_83_71_15',
-  'HLT_Rsq0p35',
-  'HLT_Rsq0p40',
-  'HLT_RsqMR300_Rsq0p09_MR200_4jet',
-  'HLT_RsqMR300_Rsq0p09_MR200',
-  'HLT_RsqMR320_Rsq0p09_MR200_4jet',
-  'HLT_RsqMR320_Rsq0p09_MR200',
-  'HLT_SingleJet30_Mu12_SinglePFJet40',
-]
-
-
-#---
-
-TTREE_KEY = 'Events'
+### ----------------------------------------------------------------------------------------------------
 
 #### main
 if __name__ == '__main__':
+
+   TTREE_KEY = 'Events'
+
    ### args
    parser = argparse.ArgumentParser(description=__doc__)
 
-   parser.add_argument('-i', '--input', dest='input', action='store', default='', required=False,
-                       help='path to input .root file (TopAnalysis NTuple under key "'+TTREE_KEY+'")')
+   parser.add_argument('-i', '--inputs', dest='inputs', nargs='+', default=[], required=True,
+                       help='path to input NANOAOD file(s)')
+
+   parser.add_argument('--PD', dest='PD', action='store', default=None, required=True,
+                       help='name of Primary Dataset (PD) of input file(s)')
 
    parser.add_argument('-o', '--output', dest='output', action='store', default='', required=False,
                        help='path to output text file')
 
-#   parser.add_argument('-s', '--split', dest='split', action='store', type=int, default=1,
-#                       help='split output into N separate cff.py files')
-#
-#   parser.add_argument('--das-client', dest='das_client', action='store', default='/cvmfs/cms.cern.ch/common/dasgoclient',
-#                       help='path to das-client script (default: dasgoclient)')
-#
-#   parser.add_argument('--das-options', dest='das_opts',
-##                      action='store', default='limit=0,key=~/.globus/userkey.pem,cert=~/.globus/usercert.pem',
-#                       action='store', default='limit=0',
-#                       help='comma-sep list of DAS query options')
-#
-#   parser.add_argument('--valid-only', dest='valid_only', action='store_true', default=False,
-#                       help='skip data sets not in valid status')
-#
+   parser.add_argument('-r', '--run', dest='run', action='store', default=None, required=False, type=int,
+                       help='process only events in the specified Run')
+
+   parser.add_argument('--lumi-min', dest='lumi_min', action='store', default=None, required=False, type=int,
+                       help='process only events with "lumi-section >= lumi_min"')
+
+   parser.add_argument('--lumi-max', dest='lumi_max', action='store', default=None, required=False, type=int,
+                       help='process only events with "lumi-section <= lumi_max"')
+
+   parser.add_argument('--maxEvents', dest='maxEvents', action='store', default=-1, required=False, type=int,
+                       help='process only up to "maxEvents" events')
+
 #   parser.add_argument('-w', '--overwrite', dest='overwrite', action='store_true', default=False,
 #                       help='overwrite output file(s)')
 
@@ -219,8 +73,7 @@ if __name__ == '__main__':
 
    VERBOSE = False
 
-#   if not os.path.isfile(opts.input):
-#      KILL(log_prx+'invalid path to input file [-i]: '+opts.input)
+   INPUT_TFILE_PATHS = sorted(list(set(opts.inputs)))
 
    if opts.output != '':
 
@@ -230,97 +83,123 @@ if __name__ == '__main__':
    else:
 
       VERBOSE = True
-   ### -----------------
-
-   ### implementation --
-
-   RUN = 319639
-#   RUN = 320840
-
-   MAX_EVENTS = -1 #1000000
-
-#   INPUT_TFILE_PATHS = []
-#   for _tmp in list(set(INPUT_FILES)): INPUT_TFILE_PATHS += ['root://cmsxrootd.fnal.gov/'+_tmp]
-
-   INPUT_TFILE_PATHS = glob.glob('nanoAOD_'+str(RUN)+'/*.root')
-
-#   INPUT_TREES = []
-#
-#   N_total = 0
-#
-#   for i_tfile_path in INPUT_TFILE_PATHS:
-#
-#       input_tfile = ROOT.TFile.Open(i_tfile_path)
-#       if (not input_tfile) or input_tfile.IsZombie() or input_tfile.TestBit(ROOT.TFile.kRecovered): raise SystemExit(1)
-#
-#       input_ttree = input_tfile.Get(TTREE_KEY)
-#       if not (input_ttree and input_ttree.InheritsFrom('TTree')):
-#          KILL(log_prx+'input error: TTree key "writeNTuple/NTuple" not found in input file')
-#
-#       input_ttree.SetDirectory(0)
-#
-#       skimmed_tree = input_ttree.CopyTree('run=='+str(RUN))
-#       skimmed_tree.SetDirectory(0)
-#
-#       input_tfile.Close()
-#
-#       INPUT_TREES += [skimmed_tree]
-#
-#       N_total += skimmed_tree.GetEntries()
-#
-#       print ' >>> added file:', i_tfile_path, '[events='+str(N_total)+']'
-#
-#   if len(INPUT_TREES) == 0:
-#      KILL(log_prx+'input error: empty list input TTree objects')
-
-
-
-#   if len(HLT_paths) == 0:
-#
-#      for i_branch_name in input_tchain.GetListOfBranches():
-#
-#          if str(i_branch_name.GetName()).startswith('HLT_'):
-#
-#             HLT_paths += [i_branch_name.GetName()]
-#
-#      HLT_paths = sorted(list(set(HLT_paths)))
-#
-#   print HLT_paths
-#
-#   print 'TTree['+TTREE_KEY+']::GetEntries() = '+str(N_total)
 
    ### ----------------------------------------------------------------------------------------------------
 
-   pathGroup_paths = {
+   # EGamma
+   if opts.PD == 'EGamma':
 
-     'HLT_PFHT400_SixPFJet32_DoublePFBTagDeepCSV_2p94' : ['HLT_PFHT400_SixPFJet32_DoublePFBTagDeepCSV_2p94'],
-     'HLT_PFHT450_SixPFJet36_PFBTagDeepCSV_1p59'       : ['HLT_PFHT450_SixPFJet36_PFBTagDeepCSV_1p59'],
-     'HLT_PFHT350'                                     : ['HLT_PFHT350'],
-     'HLT_PFHT450_SixPFJet36'                          : ['HLT_PFHT450_SixPFJet36'],
-     'HLT_PFHT400_SixPFJet32'                          : ['HLT_PFHT400_SixPFJet32'],
+      pathGroup_paths = {
 
-     'Signal Paths': [
+        'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ': ['HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL_DZ'],
+        'HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL'   : ['HLT_Ele23_Ele12_CaloIdL_TrackIdL_IsoVL'   ],
 
-       'HLT_PFHT400_SixPFJet32_DoublePFBTagDeepCSV_2p94',
-       'HLT_PFHT450_SixPFJet36_PFBTagDeepCSV_1p59',
-     ],
+        'HLT_Ele27_WPTight_Gsf': ['HLT_Ele27_WPTight_Gsf'],
+        'HLT_Ele28_WPTight_Gsf': ['HLT_Ele28_WPTight_Gsf'],
+        'HLT_Ele30_WPTight_Gsf': ['HLT_Ele30_WPTight_Gsf'],
+        'HLT_Ele32_WPTight_Gsf': ['HLT_Ele32_WPTight_Gsf'],
+        'HLT_Ele35_WPTight_Gsf': ['HLT_Ele35_WPTight_Gsf'],
+        'HLT_Ele38_WPTight_Gsf': ['HLT_Ele38_WPTight_Gsf'],
+        'HLT_Ele40_WPTight_Gsf': ['HLT_Ele40_WPTight_Gsf'],
 
-     'Control Paths': [
+        'HLT_Ele28_eta2p1_WPTight_Gsf_HT150'                    : ['HLT_Ele28_eta2p1_WPTight_Gsf_HT150'                    ],
+        'HLT_Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned': ['HLT_Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned'],
 
-       'HLT_PFHT350',
-       'HLT_PFHT450_SixPFJet36',
-       'HLT_PFHT400_SixPFJet32',
-     ],
+        'EleHT_OR_EleJet': [
 
-     'Signal+Control Paths': [
+          'HLT_Ele28_eta2p1_WPTight_Gsf_HT150',
+          'HLT_Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned',
+        ],
 
-       'HLT_PFHT400_SixPFJet32_DoublePFBTagDeepCSV_2p94',
-       'HLT_PFHT450_SixPFJet36_PFBTagDeepCSV_1p59',
-       'HLT_PFHT350',
-       'HLT_PFHT450_SixPFJet36',
-       'HLT_PFHT400_SixPFJet32',
-     ],
-   }
+        'Ele32_OR_EleHT': [
+
+          'HLT_Ele32_WPTight_Gsf',
+          'HLT_Ele28_eta2p1_WPTight_Gsf_HT150',
+        ],
+
+        'Ele32_OR_EleJet': [
+
+          'HLT_Ele32_WPTight_Gsf',
+          'HLT_Ele30_eta2p1_WPTight_Gsf_CentralPFJet35_EleCleaned',
+        ],
+      }
+
+   # SingleMuon
+   elif opts.PD == 'SingleMuon':
+
+      pathGroup_paths = {
+      
+        'HLT_IsoMu24_eta2p1': ['HLT_IsoMu24_eta2p1'],
+        'HLT_IsoMu24'       : ['HLT_IsoMu24'       ],
+        'HLT_IsoMu27'       : ['HLT_IsoMu27'       ],
+      }
+      
+   # MuonEG
+   elif opts.PD == 'MuonEG':
+      
+      pathGroup_paths = {
+      
+        'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ': ['HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL_DZ'],
+        'HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL'   : ['HLT_Mu12_TrkIsoVVL_Ele23_CaloIdL_TrackIdL_IsoVL'   ],
+        'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ': ['HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL_DZ'],
+        'HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL'   : ['HLT_Mu23_TrkIsoVVL_Ele12_CaloIdL_TrackIdL_IsoVL'   ],
+      }
+      
+   # DoubleMuon
+   elif opts.PD == 'DoubleMuon':
+      
+      pathGroup_paths = {
+      
+        'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8': ['HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass3p8'],
+        'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8'  : ['HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_Mass8'  ],
+        'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ'        : ['HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ'        ],
+        'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL'           : ['HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL'           ],
+      }
+      
+   # JetHT
+   elif opts.PD == 'JetHT':
+
+      pathGroup_paths = {
+
+        'HLT_PFHT400_SixPFJet32_DoublePFBTagDeepCSV_2p94' : ['HLT_PFHT400_SixPFJet32_DoublePFBTagDeepCSV_2p94'],
+        'HLT_PFHT450_SixPFJet36_PFBTagDeepCSV_1p59'       : ['HLT_PFHT450_SixPFJet36_PFBTagDeepCSV_1p59'],
+        'HLT_PFHT350'                                     : ['HLT_PFHT350'],
+        'HLT_PFHT450_SixPFJet36'                          : ['HLT_PFHT450_SixPFJet36'],
+        'HLT_PFHT400_SixPFJet32'                          : ['HLT_PFHT400_SixPFJet32'],
+
+        'Signal Paths': [
+
+          'HLT_PFHT400_SixPFJet32_DoublePFBTagDeepCSV_2p94',
+          'HLT_PFHT450_SixPFJet36_PFBTagDeepCSV_1p59',
+        ],
+      
+        'Control Paths': [
+      
+          'HLT_PFHT350',
+          'HLT_PFHT450_SixPFJet36',
+          'HLT_PFHT400_SixPFJet32',
+        ],
+      
+        'Signal+Control Paths': [
+      
+          'HLT_PFHT400_SixPFJet32_DoublePFBTagDeepCSV_2p94',
+          'HLT_PFHT450_SixPFJet36_PFBTagDeepCSV_1p59',
+          'HLT_PFHT350',
+          'HLT_PFHT450_SixPFJet36',
+          'HLT_PFHT400_SixPFJet32',
+        ],
+      }
+   ### ----------------------------------------------------------------------------------------------------
+
+   #### HLT Menu
+   from Menu_HLT import *
+
+   HLT_paths = []
+   for _key in datasetMap:
+       if opts.PD in datasetMap[_key]: HLT_paths += [_key]
+   HLT_paths = sorted(list(set([_tmp[:_tmp.rfind('_v')] for _tmp in HLT_paths])))
+
+   ### ----------------------------------------------------------------------------------------------------
 
    pathGroup_dict = {}
 
@@ -331,7 +210,7 @@ if __name__ == '__main__':
 
    ### ----------------------------------------------------------------------------------------------------
 
-   lumiSections = []
+   runLumi_dict = {}
 
    evt_N = 0
 
@@ -358,17 +237,24 @@ if __name__ == '__main__':
 
        for i_evt, evt in enumerate(input_ttree):
 
-           if (i_evt % 100000) == 0: print i_evt
+           if (i_evt != 0) and ((i_evt % 100000) == 0): print i_evt
 
-           if evt.run != RUN: continue
+           if (opts.run != None) and (evt.run != opts.run): continue
+
+           if (opts.lumi_min != None) and (not (evt.luminosityBlock >= opts.lumi_min)): continue
+           if (opts.lumi_max != None) and (not (evt.luminosityBlock <= opts.lumi_max)): continue
+
+           if str(evt.run) not in runLumi_dict:
+              runLumi_dict[str(evt.run)] = []
+
+           if evt.luminosityBlock not in runLumi_dict[str(evt.run)]:
+              runLumi_dict[str(evt.run)] += [evt.luminosityBlock]
 
            if (evt_N % 100000) == 0: print '[', evt_N, ']'
 
            evt_N += 1
 
-           if (MAX_EVENTS >= 0) and (evt_N > MAX_EVENTS): break_file_loop = True; break;
-
-           if evt.luminosityBlock not in lumiSections: lumiSections += [evt.luminosityBlock]
+           if (opts.maxEvents >= 0) and (evt_N > opts.maxEvents): break_file_loop = True; break;
 
            for i_pg in pathGroup_dict:
 
@@ -385,18 +271,35 @@ if __name__ == '__main__':
        if break_file_loop: break
    ### -----------------
 
-   if len(lumiSections) != 0:
+   N_LUMI_SECTIONS = 0
 
-      TIME_SEC = len(set(lumiSections)) * 23.31
+   for key_run in runLumi_dict:
+
+       runLumi_dict[key_run] = sorted(list(set(runLumi_dict[key_run])))
+
+       N_LUMI_SECTIONS += len(runLumi_dict[key_run])
+
+       runLumi_dict[key_run] = [[_tmp] for _tmp in runLumi_dict[key_run]]
+
+   if N_LUMI_SECTIONS == 0:
+
+      WARNING(log_prx+'empty of list of luminosity-sections, cannot determine rate values')
+
+   else:
+
+      TIME_SEC = N_LUMI_SECTIONS * LUMI_SECTION_TIME_SEC
 
       # conversion from counts to Hz
       for _tmp in pathGroup_dict:
           pathGroup_dict[_tmp]['rate_bare'] = pathGroup_dict[_tmp]['count_bare'] / TIME_SEC
           pathGroup_dict[_tmp]['rate_pure'] = pathGroup_dict[_tmp]['count_pure'] / TIME_SEC
 
-   print pathGroup_dict
-
    ### output ----------
    if opts.output != '':
+
       json.dump(pathGroup_dict, open(opts.output, 'w'), sort_keys=True, indent=2)
+
+      json.dump(runLumi_dict, open(os.path.splitext(opts.output)[0]+'_lumis.json', 'w'), sort_keys=True, indent=2)
    ### -----------------
+
+   print pathGroup_dict
