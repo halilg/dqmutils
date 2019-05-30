@@ -1,1 +1,12 @@
 echo "\nopen('TEST.dump.py', 'w').write(process.dumpPython())\n" >> TEST.py
+
+---
+
+dqmoffline, validation
+
+- reproduce dir structure
+- understand what seq are dqm-offline, what are validation
+- start from Top sequences
+
+input:
+- GEN-SIM-RECO from Fall18

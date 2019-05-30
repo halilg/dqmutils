@@ -20,11 +20,12 @@ mkdir -p ${OUTPUT_DIR}
 cd       ${OUTPUT_DIR}
 
 #EDM_INPUT=/store/relval/CMSSW_10_6_0_pre2/RelValTTbar_13/GEN-SIM-RECO/PUpmx25ns_105X_upgrade2018_realistic_v6-v1/10000/B82E4EBC-7E5F-314C-B7BE-B44C418F244A.root
-DAS_SAMPLE=/RelValTTbar_13/CMSSW_10_6_0_pre2-PUpmx25ns_105X_upgrade2018_realistic_v6-v1/GEN-SIM-RECO
+#DAS_SAMPLE=/RelValTTbar_13/CMSSW_10_6_0_pre2-PUpmx25ns_105X_upgrade2018_realistic_v6-v1/GEN-SIM-RECO
+DAS_SAMPLE=/RelValTTbar_13UP17/CMSSW_10_6_0_pre2-PUpmx25ns_105X_mc2017_realistic_v7_ulhlt17hs_pmx-v1/FEVTDEBUGHLT
 
 dasgoclient --query "file dataset=${DAS_SAMPLE}" > inputs.txt
 
-OUTPUT_TAG=RelValTTbar_13_CMSSW_10_6_0_pre2-PUpmx25ns_105X_upgrade2018_realistic_v6
+OUTPUT_TAG=RelValTTbar_13UP17_CMSSW_10_6_0_pre2_PUpmx25ns_105X_mc2017_realistic_v7_ulhlt17hs_pmx
 
 STEP1_OUTPUT=${OUTPUT_TAG}_DQM.root
 STEP1_CFG_PY=${OUTPUT_TAG}_DQM_cfg.py
