@@ -1,16 +1,6 @@
 #!/usr/bin/env python
-"""evaluation_driver.py --
- wrapper to a DNN evaluation script:
-  - creates the shell and batch-submission script for each input file
+"""driver.py -- creates scripts for batch-submission of DQM jobs
 """
-
-#Necessary Inputs:
-#  - path to input-dir with .root file(s) containing TTrees
-#  - path to output directory with corresponding script(s) to execute evaluation
-#  - path to executable file to be used in batch job(s);
-#    the executable has to be configurable with command-line arguments "-i [input .root file]" and "-o [output .root file]"
-#"""
-
 import argparse
 import os
 import math
@@ -138,14 +128,23 @@ if __name__ == '__main__':
     parser.add_argument('-d', '--das-dataset', dest='das_dataset', action='store', default=None, required=True,
                         help='name of input dataset in DAS')
 
-    parser.add_argument('-n', '--name', dest='name', action='store', default='dqmjob', required=False,
-                        help='prefix of output files\' names')
-
     parser.add_argument('-o', '--output', dest='output', action='store', default=None, required=True,
                         help='path to output directory')
 
-#    parser.add_argument('-e', '--executable', dest='executable', action='store', default=None, required=True,
-#                        help='path to executable file used in batch job(s)')
+    parser.add_argument('--name', dest='name', action='store', default='dqmjob', required=False,
+                        help='prefix of output files\' names (example: [NAME]_[counter].[ext])')
+
+    parser.add_argument('-s', '--step', dest='step', action='store', default=None, required=True,
+                        help='argument of option "--step" of cmsDriver.py')
+
+    parser.add_argument('-e', '--era', dest='era', action='store', default=None, required=True, choices=['2016', '2017', '2018'],
+                        help='path to executable file used in batch job(s)')
+
+    parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1, required=False,
+                        help='maximum number of events per job (used as argument of "-n" option in cmsDriver.py)')
+
+    parser.add_argument('--max-inputs', dest='max_inputs', action='store', type=int, default=-1, required=False,
+                        help='maximum number of input files to be processed (if integer is negative, all files will be processed)')
 
 #    parser.add_argument('--exe-format-input', dest='exe_format_input', action='store', default='root',
 #                        help='format of input file to be used by executable via "-i" (name of file extension without dot)')
@@ -177,7 +176,6 @@ if __name__ == '__main__':
     log_prx = os.path.basename(__file__)+' -- '
 
     ### opts --------------------
-
     VERBOSE = bool(opts.verbose and (not opts.submit))
 
 #    if not os.path.isdir(opts.input):
@@ -189,6 +187,9 @@ if __name__ == '__main__':
 #    if not os.path.isfile(opts.executable):
 #       KILL(log_prx+'target path to executable file used in batch job(s) [-e]: '+str(opts.executable))
 
+    if opts.n_events == 0:
+       KILL(log_prx+'logic error: requesting zero events per job (use non-zero value for argument of option "-n")')
+
     if opts.batch != None:
        if opts.submit and (not opts.dry_run):
           if opts.batch == 'htc': which('condor_submit')
@@ -198,24 +199,24 @@ if __name__ == '__main__':
 
 #    EXEC_FILE_ABSPATH = os.path.abspath(opts.executable)
 
-    ### convert valid file paths to absolute paths
-    for i_idx, i_opt in enumerate(opts_unknown):
-        if os.path.isfile(i_opt): opts_unknown[i_idx] = os.path.abspath(os.path.realpath(i_opt))
-
+    ### unrecognized command-line arguments
+    if opts_unknown:
+       KILL(log_prx+'unrecognized command-line arguments: '+str(opts_unknown))
     ### -------------------------
 
     ### create list of relative paths to input files
-
-    das_dataset_files = command_output_lines('dasgoclient --query "file dataset='+opts.das_dataset+'"')
+    das_dataset_files = command_output_lines('dasgoclient --query "file dataset='+str(opts.das_dataset)+'"')
     das_dataset_files = [_tmp for _tmp in das_dataset_files if _tmp != '']
     das_dataset_files = sorted(list(set(das_dataset_files)))
 
-#    ### convert command-line arguments unknown to the driver
-#    ### to a list of command-line arguments to be used
-#    ### by the executable in every batch job
-#    EXEC_COMMON_OPTS = convert_args_to_lines(opts_unknown)
+    if len(das_dataset_files) == 0:
+       KILL(log_prx+'empty list of input files for dataset: '+str(opts.das_dataset))
 
-    if len(das_dataset_files) == 0: KILL('AAA')
+    if opts.max_inputs == 0:
+       KILL(log_prx+'logic error: requesting a maximum of zero input files (use non-zero value for argument of option --max-inputs)')
+
+    elif opts.max_inputs > 0:
+       das_dataset_files = das_dataset_files[:opts.max_inputs]
 
     outputname_postfix_format = '_{:0'+str(1+int(math.log10(len(das_dataset_files))))+'d}'
 
@@ -239,6 +240,16 @@ if __name__ == '__main__':
 
         i_SHELL_COMMANDS += [['OUTPUT_TAG='+i_OUTPUT_BASENAME_woExt]]
 
+        if   opts.era =='2016': i_SHELL_COMMANDS += [['OPT_CONDITIONS=auto:phase1_2016_realistic'], ['OPT_ERA=Run2_2016'],]
+        elif opts.era =='2017': i_SHELL_COMMANDS += [['OPT_CONDITIONS=auto:phase1_2017_realistic'], ['OPT_ERA=Run2_2017'],]
+        elif opts.era =='2018': i_SHELL_COMMANDS += [['OPT_CONDITIONS=auto:phase1_2018_realistic'], ['OPT_ERA=Run2_2018'],]
+        else:
+          KILL(log_prx+'invalid argument for option "--era": '+str(opts.era))
+
+        i_SHELL_COMMANDS += [['N_EVENTS='+str(opts.n_events)]]
+
+        i_SHELL_COMMANDS += [['STEP1_STEP='+str(opts.step)]]
+
         i_SHELL_COMMANDS += [["""\
 STEP1_OUTPUT=${OUTPUT_TAG}_DQM.root
 STEP1_CFG_PY=${OUTPUT_TAG}_DQM_cfg.py
@@ -248,21 +259,21 @@ STEP2_CFG_PY=${OUTPUT_TAG}_Harvesting_cfg.py
 if [ ! -f ${STEP1_OUTPUT} ]; then
 
   cmsDriver.py step1 \\
-   --step DQM:offlineHLTSource4physicsPD \\
+   --step ${STEP1_STEP} \\
    --filein          ${INPUT_EDM_FILE} \\
    --fileout         ${STEP1_OUTPUT} \\
    --python_filename ${STEP1_CFG_PY} \\
    --mc \\
    --eventcontent DQM \\
    --datatier DQMIO \\
-   --conditions auto:phase1_2018_realistic \\
-   --era Run2_2018 \\
+   --conditions ${OPT_CONDITIONS} \\
+   --era ${OPT_ERA} \\
    --geometry DB:Extended \\
    --nThreads 1 \\
    --no_exec \\
    --runUnscheduled \\
    --customise Configuration/DataProcessing/Utils.addMonitoring \\
-   -n -1 || exit $? ;
+   -n ${N_EVENTS} || exit $? ;
 
   cmsRun ${STEP1_CFG_PY}
 
@@ -282,11 +293,11 @@ if [ -f ${STEP1_OUTPUT} ]; then
    --filetype DQM \\
    --mc \\
    --scenario pp \\
-   --conditions auto:phase1_2018_realistic \\
-   --era Run2_2018 \\
+   --conditions ${OPT_CONDITIONS} \\
+   --era ${OPT_ERA} \\
    --geometry DB:Extended \\
    --no_exec \\
-   -n -1 || exit $? ;
+   -n ${N_EVENTS} || exit $? ;
 
   cmsRun ${STEP2_CFG_PY}
 

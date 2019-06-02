@@ -91,7 +91,7 @@ if __name__ == '__main__':
 
                    i_finp = os.path.join(path, name)
 
-                   FILES_INPUT += [os.path.abspath(i_finp)]
+                   FILES_INPUT += [i_finp]
 
                    i_fout = os.path.splitext(i_finp)[0]+'.'+EXT_OUT
 
@@ -204,7 +204,7 @@ if __name__ == '__main__':
 
                    output_tfile_root.Close()
 
-#                   if opts.verbose: print 'output ROOT file is valid:', output_file_root
+                   if opts.verbose: print 'output ROOT file is valid:', output_file_root
 
              counter_completed += 1
 
@@ -219,7 +219,7 @@ if __name__ == '__main__':
 
           if opts.resubmit:
 
-             print colored_text('> resubmitting', ['93']), colored_text(resub_file, ['1', '93'])
+             print colored_text('> resubmitting job:', ['93']), colored_text(resub_file, ['1', '93'])
 
              resub_file_abspath = os.path.abspath(os.path.realpath(resub_file))
 
@@ -229,7 +229,7 @@ if __name__ == '__main__':
 
           else:
 
-             print colored_text('> job to be resubmitted', ['93']), colored_text(resub_file, ['1', '93'])
+             print colored_text('> job to be resubmitted:', ['93']), colored_text(resub_file, ['1', '93'])
 
     counter_format = '{:>'+str(1+int(math.log10(counter_input)))+'}' if counter_input > 0 else '{:>1}'
 
