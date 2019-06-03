@@ -20,6 +20,7 @@ def batch_job_HTCondor(**kwargs):
 
     # batch configuration options
     _OPTS = [
+
       'batch_name = '+kwargs['output_basename'],
 
       'executable = '+_OFILE_ABSPATH,
@@ -30,23 +31,28 @@ def batch_job_HTCondor(**kwargs):
 
       '#arguments = ',
 
-      'transfer_executable = True',
+      '#transfer_executable = True',
 
-      'universe = vanilla',
+      '+JobFlavour = "workday"',
+
+      '#universe = vanilla',
 
       'getenv = True',
 
       'should_transfer_files   = IF_NEEDED',
       'when_to_transfer_output = ON_EXIT',
 
-      'requirements = (OpSysAndVer == "SL6")',
-      '#requirements = (OpSysAndVer == "SL6" || OpSysAndVer == "CentOS7")',
+      '#requirements = (OpSysAndVer == "SL6")',
+      'requirements = (OpSysAndVer == "SL6" || OpSysAndVer == "CentOS7")',
 
-      ' RequestMemory  =  2000',
-      '+RequestRuntime = 10800',
-
-      'queue',
+      '# RequestMemory  =  2000',
+      '#+RequestRuntime = 10800',
     ]
+
+    if 'transfer_input_files' in kwargs:
+       _OPTS += ['transfer_input_files    = '+(','.join(kwargs['transfer_input_files']))]
+
+    _OPTS += ['queue']
 
     _UPDATED_OPTS = []
 
@@ -77,10 +83,10 @@ def batch_job_HTCondor(**kwargs):
     _o_shebang = '#!/bin/bash'
     _o_file.write(_o_shebang+'\n')
 
-    # HTCondor getenv=True does not export LD_LIBRARY_PATH
-    # --> added by hand in the script itself
-    if 'LD_LIBRARY_PATH' in os.environ:
-       _o_file.write('\n'+'export LD_LIBRARY_PATH='+os.environ['LD_LIBRARY_PATH']+'\n')
+#    # HTCondor getenv=True does not export LD_LIBRARY_PATH
+#    # --> added by hand in the script itself
+#    if 'LD_LIBRARY_PATH' in os.environ:
+#       _o_file.write('\n'+'export LD_LIBRARY_PATH='+os.environ['LD_LIBRARY_PATH']+'\n')
 
     _o_file.write('\n'+kwargs['output_string']+'\n')
 
@@ -220,6 +226,12 @@ if __name__ == '__main__':
 
     outputname_postfix_format = '_{:0'+str(1+int(math.log10(len(das_dataset_files))))+'d}'
 
+    EXE('mkdir -p '+OUTPUT_DIR)
+    if ('X509_USER_PROXY' in os.environ) and os.path.isfile(os.environ['X509_USER_PROXY']):
+       EXE('cp '+os.environ['X509_USER_PROXY']+' '+OUTPUT_DIR+'/X509_USER_PROXY')
+    else:
+       KILL(log_prx+'global variable X509_USER_PROXY is not a valid path to a voms certificate (create voms proxy before submitting jobs)')
+
     ### create output script(s)
     for i_inputfile_idx, i_inputfile in enumerate(das_dataset_files):
 
@@ -233,6 +245,18 @@ if __name__ == '__main__':
         i_OUTPUT_DIR = OUTPUT_DIR+'/'+i_OUTPUT_BASENAME_woExt
 
         i_SHELL_COMMANDS  = [['set -e']]
+
+        if 'CMSSW_BASE' in os.environ:
+
+           i_SHELL_COMMANDS += [
+             ['cd '+os.environ['CMSSW_BASE']+'/src'],
+             ['eval `scram runtime -sh`'],
+           ]
+
+        else:
+           KILL(log_prx+'global variable CMSSW_BASE is not defined (enable cms-sw enviroment with "cmsenv" before submitting jobs)')
+
+        i_SHELL_COMMANDS += [['export X509_USER_PROXY='+OUTPUT_DIR+'/X509_USER_PROXY']]
 
         i_SHELL_COMMANDS += [['cd '+i_OUTPUT_DIR]]
 
@@ -321,6 +345,8 @@ fi\
              'output_directory': i_OUTPUT_DIR,
 
              'output_subdirectory': opts.batch,
+
+#             'transfer_input_files': [OUTPUT_DIR+'/X509_USER_PROXY'],
 
              'submit' : opts.submit,
 

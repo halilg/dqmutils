@@ -10,3 +10,6 @@ rm -rf TTTo2L2Nu_HT500Njet7_TuneCP5_RunIIAutumn18DRPremix
  --step DQM:offlineHLTSourceOnAOD
 
 # DQM:offlineHLTSource4physicsPD
+
+
+# skipBadFiles=cms.tracked.bool(True)
