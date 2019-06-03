@@ -226,7 +226,7 @@ if __name__ == '__main__':
 
     outputname_postfix_format = '_{:0'+str(1+int(math.log10(len(das_dataset_files))))+'d}'
 
-    EXE('mkdir -p '+OUTPUT_DIR)
+    EXE('mkdir '+OUTPUT_DIR)
     if ('X509_USER_PROXY' in os.environ) and os.path.isfile(os.environ['X509_USER_PROXY']):
        EXE('cp '+os.environ['X509_USER_PROXY']+' '+OUTPUT_DIR+'/X509_USER_PROXY')
     else:
