@@ -1,8 +1,10 @@
 #!/usr/bin/env python
-"""driver.py -- creates scripts for batch-submission of DQM jobs
+"""dqmJobs_driver.py -- creates scripts for batch-submission of DQM jobs
 """
 import argparse
 import os
+import json
+import copy
 import math
 
 from common import *
@@ -137,20 +139,26 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output', action='store', default=None, required=True,
                         help='path to output directory')
 
+    parser.add_argument('-j', '--json-workflows', dest='json_workflows', action='store', default=os.path.dirname(os.path.abspath(__file__))+'/dqmJobs_driver_workflows.json',
+                        help='path to .json file containing configuration of workflows for cmsDriver.py')
+
+    parser.add_argument('-w', '--workflow', dest='workflow', action='store', default=None, required=True,
+                        help='name of cmsDriver.py workflow (options to be defined in .json file)')
+
     parser.add_argument('--name', dest='name', action='store', default='dqmjob', required=False,
                         help='prefix of output files\' names (example: [NAME]_[counter].[ext])')
 
-    parser.add_argument('-s', '--step', dest='step', action='store', default=None, required=True,
-                        help='argument of option "--step" of cmsDriver.py')
+    parser.add_argument('--max-inputs', dest='max_inputs', action='store', type=int, default=-1, required=False,
+                        help='maximum number of input files to be processed (if integer is negative, all files will be processed)')
 
-    parser.add_argument('-e', '--era', dest='era', action='store', default=None, required=True, choices=['2016', '2017', '2018'],
-                        help='path to executable file used in batch job(s)')
+#    parser.add_argument('-s', '--step', dest='step', action='store', default=None, required=True,
+#                        help='argument of option "--step" of cmsDriver.py')
+#
+#    parser.add_argument('-e', '--era', dest='era', action='store', default=None, required=True, choices=['2016', '2017', '2018'],
+#                        help='path to executable file used in batch job(s)')
 
     parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1, required=False,
                         help='maximum number of events per job (used as argument of "-n" option in cmsDriver.py)')
-
-    parser.add_argument('--max-inputs', dest='max_inputs', action='store', type=int, default=-1, required=False,
-                        help='maximum number of input files to be processed (if integer is negative, all files will be processed)')
 
 #    parser.add_argument('--exe-format-input', dest='exe_format_input', action='store', default='root',
 #                        help='format of input file to be used by executable via "-i" (name of file extension without dot)')
@@ -205,6 +213,16 @@ if __name__ == '__main__':
 
 #    EXEC_FILE_ABSPATH = os.path.abspath(opts.executable)
 
+    if not os.path.isfile(opts.json_workflows):
+       KILL(log_prx+'invalid path to .json file containing configuration of workflows for cmsDriver.py [-j]: '+str(opts.json_workflows))
+
+    json_workflows_dict = json.load(open(opts.json_workflows))
+
+    if opts.workflow not in json_workflows_dict:
+       KILL(log_prx+'invalid name ("'+str(opts.workflow)+'") for cmsDriver.py workflow, available workflows in .json file are: '+str(sorted(json_workflows_dict.keys())))
+
+    workflow_conf = json_workflows_dict[opts.workflow]
+
     ### unrecognized command-line arguments
     if opts_unknown:
        KILL(log_prx+'unrecognized command-line arguments: '+str(opts_unknown))
@@ -226,11 +244,21 @@ if __name__ == '__main__':
 
     outputname_postfix_format = '_{:0'+str(1+int(math.log10(len(das_dataset_files))))+'d}'
 
-    EXE('mkdir '+OUTPUT_DIR)
-    if ('X509_USER_PROXY' in os.environ) and os.path.isfile(os.environ['X509_USER_PROXY']):
-       EXE('cp '+os.environ['X509_USER_PROXY']+' '+OUTPUT_DIR+'/X509_USER_PROXY')
+    voms_cert_path = None
+
+    if ('X509_USER_PROXY' in os.environ):
+       voms_cert_path = os.environ['X509_USER_PROXY']
+
     else:
-       KILL(log_prx+'global variable X509_USER_PROXY is not a valid path to a voms certificate (create voms proxy before submitting jobs)')
+       voms_cert_path = '/tmp/x509up_u'+os.environ['UID']
+
+    if not os.path.isfile(voms_cert_path): EXE('voms-proxy-init --voms cms')
+
+    if not os.path.isfile(voms_cert_path):
+       KILL(log_prx+'invalid path to voms certificate: '+voms_cert_path)
+
+    EXE('mkdir '+OUTPUT_DIR)
+    EXE('cp '+voms_cert_path+' '+OUTPUT_DIR+'/X509_USER_PROXY')
 
     ### create output script(s)
     for i_inputfile_idx, i_inputfile in enumerate(das_dataset_files):
@@ -260,79 +288,38 @@ if __name__ == '__main__':
 
         i_SHELL_COMMANDS += [['cd '+i_OUTPUT_DIR]]
 
-        i_SHELL_COMMANDS += [['INPUT_EDM_FILE='+i_inputfile]]
+        cmsDriver_cmd_lines = ['cmsDriver.py step1']
 
-        i_SHELL_COMMANDS += [['OUTPUT_TAG='+i_OUTPUT_BASENAME_woExt]]
+        cmsDriver_opts_dict = copy.deepcopy(workflow_conf)
 
-        if   opts.era =='2016': i_SHELL_COMMANDS += [['OPT_CONDITIONS=auto:phase1_2016_realistic'], ['OPT_ERA=Run2_2016'],]
-        elif opts.era =='2017': i_SHELL_COMMANDS += [['OPT_CONDITIONS=auto:phase1_2017_realistic'], ['OPT_ERA=Run2_2017'],]
-        elif opts.era =='2018': i_SHELL_COMMANDS += [['OPT_CONDITIONS=auto:phase1_2018_realistic'], ['OPT_ERA=Run2_2018'],]
-        else:
-          KILL(log_prx+'invalid argument for option "--era": '+str(opts.era))
+        cmsDriver_opts_dict.update({
 
-        i_SHELL_COMMANDS += [['N_EVENTS='+str(opts.n_events)]]
+          '--filein': i_inputfile,
 
-        i_SHELL_COMMANDS += [['STEP1_STEP='+str(opts.step)]]
+          '--fileout': i_OUTPUT_BASENAME_woExt+'_DQM.root',
 
-        i_SHELL_COMMANDS += [["""\
-STEP1_OUTPUT=${OUTPUT_TAG}_DQM.root
-STEP1_CFG_PY=${OUTPUT_TAG}_DQM_cfg.py
-STEP2_CFG_PY=${OUTPUT_TAG}_Harvesting_cfg.py
+          '--python_filename': i_OUTPUT_BASENAME_woExt+'_DQM_cfg.py',
 
-# --- Step_1: DQM
-if [ ! -f ${STEP1_OUTPUT} ]; then
+          '-n': str(opts.n_events),
 
-  cmsDriver.py step1 \\
-   --step ${STEP1_STEP} \\
-   --filein          ${INPUT_EDM_FILE} \\
-   --fileout         ${STEP1_OUTPUT} \\
-   --python_filename ${STEP1_CFG_PY} \\
-   --mc \\
-   --eventcontent DQM \\
-   --datatier DQMIO \\
-   --conditions ${OPT_CONDITIONS} \\
-   --era ${OPT_ERA} \\
-   --geometry DB:Extended \\
-   --nThreads 1 \\
-   --no_exec \\
-   --runUnscheduled \\
-   --customise Configuration/DataProcessing/Utils.addMonitoring \\
-   -n ${N_EVENTS} || exit $? ;
+          '--no_exec': '',
+        })
 
-  cmsRun ${STEP1_CFG_PY}
+        for i_key in sorted(cmsDriver_opts_dict.keys()):
 
-else
+            i_val = cmsDriver_opts_dict[i_key]
 
-  printf "\\n%s\\n\\n" " >>> WARNING -- skipped Step_1 , target output file already exists: ${STEP1_OUTPUT}"
-fi
+#            if not isinstance(i_val, str):
+#               KILL(log_prx+'invalid type for argument of cmsDriver option "'+str(i_key)+'": '+str(i_val))
 
-# --- Step_2: Harvesting (output: DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO.root)
+            cmsDriver_cmd_lines += [str(i_key)+' '+str(i_val)]
 
-if [ -f ${STEP1_OUTPUT} ]; then
+        cmsDriver_cmd = ' \\\n '.join(cmsDriver_cmd_lines)
 
-  cmsDriver.py step2 \\
-   --step HARVESTING:hltOfflineDQMClient --harvesting AtRunEnd \\
-   --filein     file:${STEP1_OUTPUT} \\
-   --python_filename ${STEP2_CFG_PY} \\
-   --filetype DQM \\
-   --mc \\
-   --scenario pp \\
-   --conditions ${OPT_CONDITIONS} \\
-   --era ${OPT_ERA} \\
-   --geometry DB:Extended \\
-   --no_exec \\
-   -n ${N_EVENTS} || exit $? ;
+        i_SHELL_COMMANDS += [[cmsDriver_cmd]]
 
-  cmsRun ${STEP2_CFG_PY}
-
-else
-
-  printf "\\n%s\\n\\n" " >>> WARNING -- skipped Step_2 , target input file not found: ${STEP1_OUTPUT}"
-fi\
-"""
-        ]]
-
-        i_SHELL_COMMANDS += [['touch '+i_OUTPUT_BASENAME_woExt+'.completed']]
+        i_SHELL_COMMANDS += [['cmsRun '+i_OUTPUT_BASENAME_woExt+'_DQM_cfg.py']]
+        i_SHELL_COMMANDS += [['touch  '+i_OUTPUT_BASENAME_woExt+'.completed']]
 
         if opts.batch == 'htc':
 

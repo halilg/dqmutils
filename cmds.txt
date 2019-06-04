@@ -1,15 +1,14 @@
 
-rm -rf TTTo2L2Nu_HT500Njet7_TuneCP5_RunIIAutumn18DRPremix
-
-./driver_DQMjobs.py \
- -d "/TTTo2L2Nu_HT500Njet7_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18DRPremix-102X_upgrade2018_realistic_v15-v1/AODSIM" \
- -o TTTo2L2Nu_HT500Njet7_TuneCP5_RunIIAutumn18DRPremix \
- -e 2018 \
- --max-inputs 10 \
- -n 10 \
- --step DQM:offlineHLTSourceOnAOD
+./dqmJobs_driver.py \
+ -d "/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18DRPremix-102X_upgrade2018_realistic_v15-v1/AODSIM" \
+ -o   TTTo2L2Nu_TuneCP5_RunIIAutumn18DRPremix \
+ --max-inputs 5 \
+ -n 2000 \
+ -w MC.2018.0
 
 # DQM:offlineHLTSource4physicsPD
 
-
 # skipBadFiles=cms.tracked.bool(True)
+
+# fix driver (command line options, list of workflows)
+# fix dqmJobs_harvester.py

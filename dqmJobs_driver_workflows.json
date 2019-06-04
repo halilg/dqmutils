@@ -1,0 +1,43 @@
+{
+  "MC.2016.0": {
+
+    "--step": "DQM:offlineHLTSourceOnAOD",
+    "--eventcontent": "DQM",
+    "--datatier": "DQMIO",
+    "--geometry": "DB:Extended",
+    "--nThreads": "1",
+    "--runUnscheduled": "",
+    "--customise": "Configuration/DataProcessing/Utils.addMonitoring",
+    "--era": "Run2_2016",
+    "--mc": "",
+    "--conditions": "auto:phase1_2016_realistic"
+  },
+
+  "MC.2017.0": {
+
+    "--step": "DQM:offlineHLTSourceOnAOD",
+    "--eventcontent": "DQM",
+    "--datatier": "DQMIO",
+    "--geometry": "DB:Extended",
+    "--nThreads": "1",
+    "--runUnscheduled": "",
+    "--customise": "Configuration/DataProcessing/Utils.addMonitoring",
+    "--era": "Run2_2017",
+    "--mc": "",
+    "--conditions": "auto:phase1_2017_realistic"
+  },
+
+  "MC.2018.0": {
+
+    "--step": "DQM:offlineHLTSourceOnAOD",
+    "--eventcontent": "DQM",
+    "--datatier": "DQMIO",
+    "--geometry": "DB:Extended",
+    "--nThreads": "1",
+    "--runUnscheduled": "",
+    "--customise": "Configuration/DataProcessing/Utils.addMonitoring",
+    "--era": "Run2_2018",
+    "--mc": "",
+    "--conditions": "auto:phase1_2018_realistic"
+  }
+}

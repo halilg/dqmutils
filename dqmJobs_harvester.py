@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""harvest_DQMjobs.py --
+"""dqmJobs_harvester.py
 """
 import argparse
 import os

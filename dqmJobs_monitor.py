@@ -1,6 +1,5 @@
 #!/usr/bin/env python
-"""Description:
- script to monitor batch jobs
+"""dqmJobs_monitor.py: script to monitor batch jobs
   * finds all batch scripts, e.g. "XXX.htc" for HTCondor and "XXX.sh" for SGE, in the input directory (including sub-directories)
   * if a file called "XXX.completed" exists, the job is considered finished
   * otherwise, the job is resubmitted if option "-r" is specified
