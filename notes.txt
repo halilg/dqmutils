@@ -1,0 +1,14 @@
+
+./dqmJobs_driver.py \
+ -d "/TTTo2L2Nu_HT500Njet7_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18DRPremix-102X_upgrade2018_realistic_v15-v1/AODSIM" \
+ -o TTTo2L2Nu_HT500Njet7_TuneCP5_RunIIAutumn18DRPremix \
+ --max-inputs 200 \
+ -n 5000 \
+ -w AOD.MC.2018.0
+
+./dqmJobs_driver.py \
+ -d "/TTTo2L2Nu_TuneCP5_13TeV-powheg-pythia8/RunIIAutumn18DRPremix-102X_upgrade2018_realistic_v15-v1/AODSIM" \
+ -o   TTTo2L2Nu_TuneCP5_RunIIAutumn18DRPremix \
+ --max-inputs 200 \
+ -n 5000 \
+ -w AOD.MC.2018.0
