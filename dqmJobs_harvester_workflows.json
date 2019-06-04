@@ -1,0 +1,13 @@
+{
+  "MC.2018.0": {
+
+    "--step": "HARVESTING:hltOfflineDQMClient",
+    "--harvesting": "AtRunEnd",
+    "--filetype": "DQM",
+    "--geometry": "DB:Extended",
+    "--scenario": "pp",
+    "--era": "Run2_2018",
+    "--mc": "",
+    "--conditions": "auto:phase1_2018_realistic"
+  }
+}

@@ -3,6 +3,8 @@
 """
 import argparse
 import os
+import json
+import copy
 import math
 
 from common import *
@@ -35,14 +37,17 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output', action='store', default=None, required=True,
                         help='path to output directory')
 
+    parser.add_argument('-j', '--json-workflows', dest='json_workflows', action='store', default=os.path.dirname(os.path.abspath(__file__))+'/dqmJobs_harvester_workflows.json',
+                        help='path to .json file containing configuration of workflows for cmsDriver.py')
+
+    parser.add_argument('-w', '--workflow', dest='workflow', action='store', default=None, required=True,
+                        help='name of cmsDriver.py workflow (options to be defined in .json file)')
+
 #    parser.add_argument('--name', dest='name', action='store', default='dqmjob', required=False,
 #                        help='prefix of output files\' names (example: [NAME]_[counter].[ext])')
 
-    parser.add_argument('-l', '--list-workflow', dest='list_workflow', nargs='+', default=[], required=True,
-                        help='list of workflows (each corresponds to cmsDriver.py directive for Harvesting)')
-
-#    parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1, required=False,
-#                        help='maximum number of events per job (used as argument of "-n" option in cmsDriver.py)')
+    parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1, required=False,
+                        help='maximum number of events per job (used as argument of "-n" option in cmsDriver.py)')
 
     parser.add_argument('--max-inputs', dest='max_inputs', action='store', type=int, default=-1, required=False,
                         help='maximum number of input files to be processed (if integer is negative, all files will be processed)')
@@ -86,17 +91,23 @@ if __name__ == '__main__':
     ### opts --------------------
     VERBOSE = bool(opts.verbose)
 
-#    if not os.path.isdir(opts.input):
-#       KILL(log_prx+'target path to input directory is not valid [-i]: '+str(opts.input))
-
     if os.path.exists(opts.output):
        KILL(log_prx+'target path to output directory already exists [-o]: '+str(opts.output))
 
-#    if opts.n_events == 0:
-#       KILL(log_prx+'logic error: requesting zero events per job (use non-zero value for argument of option "-n")')
-
-#    INPUT_DIR  = os.path.abspath(opts.input)
     OUTPUT_DIR = os.path.abspath(opts.output)
+
+    if opts.n_events == 0:
+       KILL(log_prx+'logic error: requesting zero events per job (use non-zero value for argument of option "-n")')
+
+    if not os.path.isfile(opts.json_workflows):
+       KILL(log_prx+'invalid path to .json file containing configuration of workflows for cmsDriver.py [-j]: '+str(opts.json_workflows))
+
+    json_workflows_dict = json.load(open(opts.json_workflows))
+
+    if opts.workflow not in json_workflows_dict:
+       KILL(log_prx+'invalid name ("'+str(opts.workflow)+'") for cmsDriver.py workflow, available workflows in .json file are: '+str(sorted(json_workflows_dict.keys())))
+
+    workflow_conf = json_workflows_dict[opts.workflow]
     ### -------------------------
 
     ### create list of relative paths to input files
@@ -131,16 +142,42 @@ if __name__ == '__main__':
 
     file_Harvesting_setup.write('#!/bin/bash'+'\n\n')
 
-    Harvesting_setup_cmd = cmsDriver_command(opts.list_workflow)
-    file_Harvesting_setup.write(Harvesting_setup_cmd)
+    cmsDriver_cmd_lines = ['cmsDriver.py stepHarvesting']
 
-    if not opts.no_exec:
-       file_Harvesting_setup.write('\n'+'cmsRun harvesting_cfg.py'+'\n')
+    cmsDriver_opts_dict = copy.deepcopy(workflow_conf)
+
+    cmsDriver_opts_dict.update({
+
+      '--filein': 'filelist:'+OUTPUT_DIR+'/inputs.txt',
+
+      '--python_filename': 'harvesting_cfg.py',
+
+      '-n': str(opts.n_events),
+
+      '--no_exec': '',
+    })
+
+    if opts.skipBadFiles:
+       cmsDriver_opts_dict.update({ '--customise_commands': '"process.source.skipBadFiles=cms.untracked.bool(True)"' })
+
+    for i_key in sorted(cmsDriver_opts_dict.keys()):
+
+        i_val = cmsDriver_opts_dict[i_key]
+
+#        if not isinstance(i_val, str):
+#           KILL(log_prx+'invalid type for argument of cmsDriver option "'+str(i_key)+'": '+str(i_val))
+
+        cmsDriver_cmd_lines += [str(i_key)+' '+str(i_val)]
+
+    cmsDriver_cmd = ' \\\n '.join(cmsDriver_cmd_lines)
+
+    file_Harvesting_setup.write(cmsDriver_cmd)
+
+    if not opts.no_exec: file_Harvesting_setup.write('\n\n'+ 'cmsRun harvesting_cfg.py'+'\n')
+    else               : file_Harvesting_setup.write('\n\n'+'#cmsRun harvesting_cfg.py'+'\n')
 
     file_Harvesting_setup.close()
 
     EXE('chmod u+x '+file_Harvesting_setup_path)
 
     EXE('cd '+OUTPUT_DIR+' && '+file_Harvesting_setup_path)
-
-#!! skipBadFiles=cms.tracked.bool(True)
