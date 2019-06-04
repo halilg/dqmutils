@@ -1,5 +1,19 @@
 {
-  "MC.2016.0": {
+  "RECO.MC.2018.0": {
+
+    "--step": "DQM:offlineHLTSource4physicsPD",
+    "--eventcontent": "DQM",
+    "--datatier": "DQMIO",
+    "--geometry": "DB:Extended",
+    "--nThreads": "1",
+    "--runUnscheduled": "",
+    "--customise": "Configuration/DataProcessing/Utils.addMonitoring",
+    "--era": "Run2_2018",
+    "--mc": "",
+    "--conditions": "auto:phase1_2018_realistic"
+  },
+
+  "AOD.MC.2016.0": {
 
     "--step": "DQM:offlineHLTSourceOnAOD",
     "--eventcontent": "DQM",
@@ -13,7 +27,7 @@
     "--conditions": "auto:phase1_2016_realistic"
   },
 
-  "MC.2017.0": {
+  "AOD.MC.2017.0": {
 
     "--step": "DQM:offlineHLTSourceOnAOD",
     "--eventcontent": "DQM",
@@ -27,7 +41,7 @@
     "--conditions": "auto:phase1_2017_realistic"
   },
 
-  "MC.2018.0": {
+  "AOD.MC.2018.0": {
 
     "--step": "DQM:offlineHLTSourceOnAOD",
     "--eventcontent": "DQM",

@@ -142,3 +142,5 @@ if __name__ == '__main__':
     EXE('chmod u+x '+file_Harvesting_setup_path)
 
     EXE('cd '+OUTPUT_DIR+' && '+file_Harvesting_setup_path)
+
+#!! skipBadFiles=cms.tracked.bool(True)
