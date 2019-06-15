@@ -20,11 +20,16 @@
  -n 5000 \
  -w AOD.MC.2017.0
 
+./dqmJobs_driver.py \
+ -d /RelValTTbarLepton_13UP17/CMSSW_10_6_0-PUpmx25ns_106X_mc2017_realistic_v3_ulhlt17hs_pmx-v1/FEVTDEBUGHLT \
+ -o  RelValTTbarLepton_13UP17/CMSSW_10_6_0-PUpmx25ns_106X_mc2017_realistic_v3_ulhlt17hs_pmx-v1/ \
+ -w AOD.MC.2017.0
+
 ./dqmJobs_harvester.py \
- -i RelValTTbarLepton_13UP17_CMSSW_10_6_0-PUpmx25ns_106X_mc2017_realistic_v3_ulhlt17hs_pmx-v1/*/*.root \
- -o tmptmptmp \
+ -i  RelValTTbarLepton_13UP17/CMSSW_10_6_0-PUpmx25ns_106X_mc2017_realistic_v3_ulhlt17hs_pmx-v1/*/*.root \
+ -o  RelValTTbarLepton_13UP17/CMSSW_10_6_0-PUpmx25ns_106X_mc2017_realistic_v3_ulhlt17hs_pmx-v1/harvesting/ \
  -w MC.2017.0
 
 ./plot_DQMHistos.py \
- -i tmptmptmp/DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO.root \
- -o tmptmptmp/plots
+ -i  RelValTTbarLepton_13UP17/CMSSW_10_6_0-PUpmx25ns_106X_mc2017_realistic_v3_ulhlt17hs_pmx-v1/harvesting/DQM_V0001_R000000001__Global__CMSSW_X_Y_Z__RECO.root \
+ -o  RelValTTbarLepton_13UP17/CMSSW_10_6_0-PUpmx25ns_106X_mc2017_realistic_v3_ulhlt17hs_pmx-v1/harvesting/plots

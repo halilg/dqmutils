@@ -258,7 +258,7 @@ if __name__ == '__main__':
     if not os.path.isfile(voms_cert_path):
        KILL(log_prx+'invalid path to voms certificate: '+voms_cert_path)
 
-    EXE('mkdir '+OUTPUT_DIR)
+    EXE('mkdir -p '+OUTPUT_DIR)
     EXE('cp '+voms_cert_path+' '+OUTPUT_DIR+'/X509_USER_PROXY')
 
     ### create output script(s)
