@@ -40,6 +40,7 @@ def TH1_keys(tdirectory, prefix='', contains_all=[], contains_one=[]):
     return th1_keys
 
 def get_text(x1ndc_, y1ndc_, talign_, tsize_, text_):
+
     txt = ROOT.TLatex(x1ndc_, y1ndc_, text_)
     txt.SetTextAlign(talign_)
     txt.SetTextSize(tsize_)
@@ -122,23 +123,27 @@ if __name__ == '__main__':
 
     for histo_key in sorted(histo_dict.keys()):
 
-        if histo_dict[histo_key].InheritsFrom('TH3'):
+        if not histo_dict[histo_key].InheritsFrom('TH1'):
+           WARNING(log_prx+'input histogram does not inherit from TH1 (not supported), will be skipped')
+           continue
 
+        if histo_dict[histo_key].InheritsFrom('TH3'):
            WARNING(log_prx+'input histogram inherits from TH3 (not supported), will be skipped')
            continue
 
-        elif histo_dict[histo_key].InheritsFrom('TH2'):
+        isTH2 = histo_dict[histo_key].InheritsFrom('TH2')
 
-           opt_draw = 'colz,text'
-
+        if isTH2: opt_draw = 'colz,text'
         else:
-
-           opt_draw = 'hist,e0'
+           if histo_dict[histo_key].GetName().startswith('effic_'): opt_draw = 'pex0'
+           else: opt_draw = 'hist,e'
 
         canvas = ROOT.TCanvas(histo_key, histo_key)
-        canvas.SetGrid(1,1)
         canvas.SetTickx()
         canvas.SetTicky()
+
+        if isTH2: canvas.SetGrid(0,0)
+        else    : canvas.SetGrid(1,1)
 
         T = canvas.GetTopMargin()
         R = canvas.GetRightMargin()
@@ -157,11 +162,19 @@ if __name__ == '__main__':
 
         histo_dict[histo_key].UseCurrentStyle()
 
-        histo_dict[histo_key].SetMarkerColor(2)
-        histo_dict[histo_key].SetMarkerSize(1)
-        histo_dict[histo_key].SetMarkerStyle(24)
-        histo_dict[histo_key].SetLineColor(2)
-        histo_dict[histo_key].SetLineWidth(2)
+        if isTH2:
+           histo_dict[histo_key].SetMarkerColor(1)
+           histo_dict[histo_key].SetMarkerSize(1)
+           histo_dict[histo_key].SetMarkerStyle(20)
+           histo_dict[histo_key].SetLineColor(1)
+           histo_dict[histo_key].SetLineWidth(2)
+
+        else:
+           histo_dict[histo_key].SetMarkerColor(2)
+           histo_dict[histo_key].SetMarkerSize(1)
+           histo_dict[histo_key].SetMarkerStyle(20)
+           histo_dict[histo_key].SetLineColor(2)
+           histo_dict[histo_key].SetLineWidth(2)
 
         canvas.cd()
 

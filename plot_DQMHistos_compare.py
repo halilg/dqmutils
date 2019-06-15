@@ -112,7 +112,8 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
     h_targ.SetLineColor(2)
     h_targ.SetLineWidth(2)
 
-    opt_draw = 'hist,e0'
+    opt_draw, opt_legd = 'hist,e', 'lep'
+    if h_refe.GetName().startswith('effic_'): opt_draw, opt_legd = 'pex0', 'pex0'
 
     ratio = True
 
@@ -134,8 +135,8 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
     leg.SetBorderSize(2)
     leg.SetTextFont(42)
     leg.SetFillColor(0)
-    leg.AddEntry(h_targ, '#bf{Target}: '   +target_legend   , 'lepx0')
-    leg.AddEntry(h_refe, '#bf{Reference}: '+reference_legend, 'lepx0')
+    leg.AddEntry(h_targ, '#bf{Target}: '   +target_legend   , opt_legd)
+    leg.AddEntry(h_refe, '#bf{Reference}: '+reference_legend, opt_legd)
 
     txt1 = None
     if   'denominator' in h_refe.GetTitle(): txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.05, 32, .025, '[Denominator]')
