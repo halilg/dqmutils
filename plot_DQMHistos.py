@@ -3,6 +3,8 @@ import argparse, os, ROOT
 
 from common import *
 
+from plot_style import load_plot_style
+
 def TH1_keys(tdirectory, prefix='', contains_all=[], contains_one=[]):
 
     th1_keys = []
@@ -36,6 +38,15 @@ def TH1_keys(tdirectory, prefix='', contains_all=[], contains_one=[]):
            th1_keys += [prefix+k_obj.GetName()]
 
     return th1_keys
+
+def get_text(x1ndc_, y1ndc_, talign_, tsize_, text_):
+    txt = ROOT.TLatex(x1ndc_, y1ndc_, text_)
+    txt.SetTextAlign(talign_)
+    txt.SetTextSize(tsize_)
+    txt.SetTextFont(42)
+    txt.SetNDC()
+
+    return txt
 #### ----
 
 #### main
@@ -105,12 +116,11 @@ if __name__ == '__main__':
     ### -------------------
 
     ### output files (plots)
-    for histo_key in sorted(histo_dict.keys()):
+    load_plot_style()
 
-        canvas = ROOT.TCanvas(histo_key, histo_key)
-#        canvas.SetGrid(1,1)
-#        canvas.SetTickx()
-#        canvas.SetTicky()
+    ROOT.TGaxis.SetMaxDigits(4)
+
+    for histo_key in sorted(histo_dict.keys()):
 
         if histo_dict[histo_key].InheritsFrom('TH3'):
 
@@ -119,23 +129,61 @@ if __name__ == '__main__':
 
         elif histo_dict[histo_key].InheritsFrom('TH2'):
 
-           h_draw_opt = 'colz,text'
+           opt_draw = 'colz,text'
 
         else:
 
-           h_draw_opt = 'hist,e0'
+           opt_draw = 'hist,e0'
+
+        canvas = ROOT.TCanvas(histo_key, histo_key)
+        canvas.SetGrid(1,1)
+        canvas.SetTickx()
+        canvas.SetTicky()
+
+        T = canvas.GetTopMargin()
+        R = canvas.GetRightMargin()
+        B = canvas.GetBottomMargin()
+        L = canvas.GetLeftMargin()
+
+        ROOT.TGaxis.SetExponentOffset(-L+.50*L, 0.03, 'y')
+
+        txt1 = None
+        if   'denominator' in histo_dict[histo_key].GetTitle(): txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.15, 31, .025, '[Denominator]')
+        elif 'numerator'   in histo_dict[histo_key].GetTitle(): txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.15, 31, .025, '[Numerator]')
+
+        txt2 = None # get_text(L+(1-R-L)*0.05, B+(1-B-T)*.77, 13, .040, '')
+
+        histo_dict[histo_key].SetBit(ROOT.TH1.kNoTitle)
+
+        histo_dict[histo_key].UseCurrentStyle()
+
+        histo_dict[histo_key].SetMarkerColor(2)
+        histo_dict[histo_key].SetMarkerSize(1)
+        histo_dict[histo_key].SetMarkerStyle(24)
+        histo_dict[histo_key].SetLineColor(2)
+        histo_dict[histo_key].SetLineWidth(2)
 
         canvas.cd()
-        histo_dict[histo_key].Draw(h_draw_opt)
+
+        hmax = 0.0
+        for i_bin in range(1, histo_dict[histo_key].GetNbinsX()+1):
+            hmax = max(hmax, (histo_dict[histo_key].GetBinContent(i_bin) + histo_dict[histo_key].GetBinError(i_bin)))
+
+        canvas.cd()
+
+        histo_dict[histo_key].Draw(opt_draw)
+
+        if txt1: txt1.Draw('same')
+        if txt2: txt2.Draw('same')
 
         output_basename_woExt = os.path.abspath(opts.output)+'/'+histo_key.replace(' ', '_')
 
         output_dirname = os.path.dirname(output_basename_woExt)
         if not os.path.isdir(output_dirname): EXE('mkdir -p '+output_dirname)
 
-        for _ext in EXTS:
+        for i_ext in EXTS:
 
-            out_file = output_basename_woExt+'.'+_ext
+            out_file = output_basename_woExt+'.'+i_ext
 
             canvas.SaveAs(out_file)
 
