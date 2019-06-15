@@ -44,8 +44,9 @@ def batch_job_HTCondor(**kwargs):
       'should_transfer_files   = IF_NEEDED',
       'when_to_transfer_output = ON_EXIT',
 
-      '#requirements = (OpSysAndVer == "SL6")',
-      'requirements = (OpSysAndVer == "SL6" || OpSysAndVer == "CentOS7")',
+#      'requirements = (OpSysAndVer == "SL6")',
+      'requirements = (OpSysAndVer == "CentOS7")',
+#      'requirements = (OpSysAndVer == "SL6" || OpSysAndVer == "CentOS7")',
 
       '# RequestMemory  =  2000',
       '#+RequestRuntime = 10800',
@@ -250,7 +251,7 @@ if __name__ == '__main__':
        voms_cert_path = os.environ['X509_USER_PROXY']
 
     else:
-       voms_cert_path = '/tmp/x509up_u'+os.environ['UID']
+       voms_cert_path = '/tmp/x509up_u'+str(os.getuid())
 
     if not os.path.isfile(voms_cert_path): EXE('voms-proxy-init --voms cms')
 
