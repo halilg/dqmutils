@@ -332,7 +332,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output', required=True, action='store', default=None,
                         help='path to output directory')
 
-    parser.add_argument('--only-keys', dest='only_keys', nargs='+', default=[],
+    parser.add_argument('--only-keys', dest='only_keys', nargs='+', default=['/HLT/', '/TOP/'],
                         help='list of strings required to be in histogram key')
 
     parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['png'],
