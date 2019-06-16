@@ -11,6 +11,7 @@ def WARNING(log):
 # --
 
 def EXE(cmd, suspend=True, verbose=False, dry_run=False):
+
     if verbose: print '\033[1m'+'>'+'\033[0m'+' '+cmd
     if dry_run: return
 
@@ -22,12 +23,13 @@ def EXE(cmd, suspend=True, verbose=False, dry_run=False):
 # --
 
 def get_output(cmd, permissive=False):
+
     prc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
     out, err = prc.communicate()
 
     if (not permissive) and prc.returncode:
-       KILL('get_output -- shell command failed (execute command to reproduce the error):\n'+' '*14+'> '+cmd)
+       KILL('get_output -- shell command failed [return-code='+str(prc.returncode)+'] (execute command to reproduce the error):\n'+' '*14+'> '+cmd)
 
     return (out, err)
 # --
