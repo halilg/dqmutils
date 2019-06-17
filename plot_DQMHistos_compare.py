@@ -140,7 +140,7 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
 
     ROOT.TGaxis.SetExponentOffset(-L+.50*L, 0.03, 'y')
 
-    leg = ROOT.TLegend(L+(1-R-L)*0.00, (1-T)+T*0.05, L+(1-R-L)*0.80, (1-T)+T*0.95)
+    leg = ROOT.TLegend(L+(1-R-L)*0.00, (1-T)+T*0.05, L+(1-R-L)*1.00, (1-T)+T*0.95)
     leg.SetBorderSize(2)
     leg.SetTextFont(42)
     leg.SetFillColor(0)
@@ -148,8 +148,8 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
     leg.AddEntry(h_refe, '#bf{Reference}: '+reference_legend, opt_legd)
 
     txt1 = None
-    if   histo_type == 'NUM': txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.05, 32, .025, '[Numerator]')
-    elif histo_type == 'DEN': txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.05, 32, .025, '[Denominator]')
+    if   histo_type == 'NUM': txt1 = get_text((1-R)+R*0.25, (1-T), 11, .025, '[Numerator]');   txt1.SetTextAngle(-90);
+    elif histo_type == 'DEN': txt1 = get_text((1-R)+R*0.25, (1-T), 11, .025, '[Denominator]'); txt1.SetTextAngle(-90);
 
     txt2 = None # get_text(L+(1-R-L)*0.05, B+(1-B-T)*.77, 13, .040, '')
 
@@ -231,10 +231,9 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
         if txt2: txt2.SetTextSize(txt2.GetTextSize()/pad1H); txt2.Draw('same');
 
         pad1.Update()
-#        txt1.SetY1NDC(1.-(1.-txt1.GetY1NDC())/pad1H)
-#        txt1.SetY2NDC(1.-(1.-txt1.GetY2NDC())/pad1H)
-#        txt2.SetY1NDC(1.-(1.-txt2.GetY1NDC())/pad1H)
-#        txt2.SetY2NDC(1.-(1.-txt2.GetY2NDC())/pad1H)
+
+        if txt1: txt1.SetY(1.-(1.-txt1.GetY())/pad1H)
+        if txt2: txt2.SetY(1.-(1.-txt2.GetY())/pad1H)
 
         if leg:
            leg.SetY1NDC(1.-(1.-leg.GetY1NDC())/pad1H)
