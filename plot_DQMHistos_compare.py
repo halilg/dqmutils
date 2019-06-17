@@ -119,6 +119,15 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
 
     logY = False
 
+    histo_type = None
+    if   'numerator'   in h_refe.GetTitle(): histo_type = 'NUM'
+    elif 'denominator' in h_refe.GetTitle(): histo_type = 'DEN'
+
+    # normalize (numerator, denominator) histograms to unity
+    if histo_type in ['NUM', 'DEN']:
+       if h_refe.Integral() != 0.: h_refe.Scale(1. / h_refe.Integral())
+       if h_targ.Integral() != 0.: h_targ.Scale(1. / h_targ.Integral())
+
     canvas = ROOT.TCanvas(histo_key, histo_key)
     canvas.SetGrid(1,1)
     canvas.SetTickx()
@@ -139,8 +148,8 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
     leg.AddEntry(h_refe, '#bf{Reference}: '+reference_legend, opt_legd)
 
     txt1 = None
-    if   'denominator' in h_refe.GetTitle(): txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.05, 32, .025, '[Denominator]')
-    elif 'numerator'   in h_refe.GetTitle(): txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.05, 32, .025, '[Numerator]')
+    if   histo_type == 'NUM': txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.05, 32, .025, '[Numerator]')
+    elif histo_type == 'DEN': txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.05, 32, .025, '[Denominator]')
 
     txt2 = None # get_text(L+(1-R-L)*0.05, B+(1-B-T)*.77, 13, .040, '')
 
@@ -169,6 +178,9 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
 
 #        h_refe.GetXaxis().SetRangeUser(xmin_, xmax_)
 
+        if histo_type in ['NUM', 'DEN']:
+           h_refe.GetYaxis().SetTitle('a.u.')
+
         if logY: h_refe.GetYaxis().SetRangeUser(.0003, .0003*((hmax/.0003)**(1./.85)))
         else   : h_refe.GetYaxis().SetRangeUser(.0001, .0001+((hmax-.0001) *(1./.85)))
 
@@ -194,6 +206,10 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
         h11.SetBit(ROOT.TH1.kNoTitle)
         h11.SetStats(0)
         h11.SetXTitle('')
+
+        if histo_type in ['NUM', 'DEN']:
+           h11.GetYaxis().SetTitle('a.u.')
+
         h11.GetYaxis().SetTitleSize(h11.GetYaxis().GetTitleSize()/pad1H)
         h11.GetYaxis().SetTitleOffset(h11.GetYaxis().GetTitleOffset()*pad1H)
         h11.GetXaxis().SetLabelSize(0)
@@ -255,6 +271,10 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
         h21.SetStats(0)
 #        h21.SetTitle(title_)
         h21.SetMarkerSize(0)
+
+        h21.SetFillStyle(3017)
+        h21.SetFillColor(16)
+
         h21.GetYaxis().SetTitle('Tar/Ref')
         h21.GetYaxis().CenterTitle()
         h21.GetXaxis().SetTitleSize  (h21.GetXaxis().GetTitleSize()   /(1-pad1H))
@@ -288,7 +308,7 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
 
         h21.GetYaxis().SetNdivisions(404)
 
-        h21.Draw(opt_draw)
+        h21.Draw('e2')
         h22.Draw(opt_draw+',same')
         h21.Draw('axis,same')
 
