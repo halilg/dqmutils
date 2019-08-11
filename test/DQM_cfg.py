@@ -26,7 +26,7 @@ process.maxEvents = cms.untracked.PSet(
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('/store/mc/RunIIAutumn18DRPremix/TTTo2L2Nu_HT500Njet7_TuneCP5_13TeV-powheg-pythia8/AODSIM/102X_upgrade2018_realistic_v15-v1/110000/985B45EF-B512-6C4E-AC93-BCB7A7DA80EB.root'),
+    fileNames = cms.untracked.vstring('file:/nfs/dust/cms/user/missirol/test/dqmoffline_trigger/devel_workflow1/dqmutils/store/mc/RunIIAutumn18DRPremix/TTTo2L2Nu_HT500Njet7_TuneCP5_13TeV-powheg-pythia8/AODSIM/102X_upgrade2018_realistic_v15-v1/110000/985B45EF-B512-6C4E-AC93-BCB7A7DA80EB.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 

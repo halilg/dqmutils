@@ -1,0 +1,4 @@
+#!/bin/bash
+
+export PYTHONPATH="${PYTHONPATH}":"${PWD}"
+export PYTHONDONTWRITEBYTECODE=1
