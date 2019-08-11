@@ -18,7 +18,7 @@ fi
 cd ${BASE_DIR}
 unset -v BASE_DIR
 
-CMSSW_rel=CMSSW_10_6_0_pre2
+CMSSW_rel=CMSSW_11_0_0_pre5
 
 if [ ! -d ${CMSSW_rel} ]; then
   cmsrel  ${CMSSW_rel}
@@ -32,6 +32,8 @@ eval `scram runtime -sh`
 
 # voms
 voms-proxy-init --voms cms
+
+git cms-init
 
 # DQM step
 if [ ! -d DQMOffline/Trigger ]; then git cms-addpkg DQMOffline/Trigger; fi;
