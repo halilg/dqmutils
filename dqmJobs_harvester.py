@@ -130,7 +130,7 @@ if __name__ == '__main__':
 
     INPUT_FILES = sorted(list(set(INPUT_FILES)))
 
-    EXE('mkdir '+OUTPUT_DIR)
+    EXE('mkdir -p '+OUTPUT_DIR)
 
     file_inputs_path = OUTPUT_DIR+'/inputs.txt'
     file_inputs = open(file_inputs_path, 'w')

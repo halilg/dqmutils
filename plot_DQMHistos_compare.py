@@ -91,7 +91,7 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
     elif (target is     None) and (reference is     None):
        return 1
 
-    if not (target.InheritsFrom('TH1F') or target.InheritsFrom('TH1D')):
+    if not (h_targ.InheritsFrom('TH1F') or h_targ.InheritsFrom('TH1D')):
        return 1
 
     h_refe.SetBit(ROOT.TH1.kNoTitle)
@@ -371,10 +371,10 @@ if __name__ == '__main__':
 
     ### args validation ---
 #    if not os.path.isfile(opts.target):
-#       KILL(log_prx+'invalid path to input .root file [-i]: '+opts.target)
+#       KILL(log_prx+'invalid path to input .root file for "target" [-t]: '+opts.target)
 #
 #    if not os.path.isfile(opts.reference):
-#       KILL(log_prx+'invalid path to input .root file [-i]: '+opts.reference)
+#       KILL(log_prx+'invalid path to input .root file for "reference" [-r]: '+opts.reference)
 
     if os.path.exists(opts.output):
        KILL(log_prx+'target path to output .root file already exists [-o]: '+opts.output)
@@ -385,6 +385,9 @@ if __name__ == '__main__':
 
     if len(ONLY_KEYS):
        print '\n >>> will plot only TH1 objects containing all of the following strings in their internal path:', ONLY_KEYS, '\n'
+
+    if len(opts_unknown) > 0:
+       KILL(log_prx+'unrecognized command-line arguments: '+str(opts_unknown))
     ### -------------------
 
     ### input histograms --

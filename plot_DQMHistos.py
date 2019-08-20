@@ -67,6 +67,9 @@ if __name__ == '__main__':
     parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['png'],
                         help='list of extension(s) for output file(s)')
 
+    parser.add_argument('-n', '--name-only', dest='name_only', action='store_true', default=False,
+                        help='only print name of input histograms')
+
     parser.add_argument('-v', '--verbose', dest='verbose', action='store_true', default=False,
                         help='enable verbose mode')
 
@@ -91,6 +94,9 @@ if __name__ == '__main__':
 
     if len(ONLY_KEYS):
        print '\n >>> will plot only TH1 objects containing all of the following strings in their internal path:', ONLY_KEYS, '\n'
+
+    if len(opts_unknown) > 0:
+       KILL(log_prx+'unrecognized command-line arguments: '+str(opts_unknown))
     ### -------------------
 
     ### input histograms --
@@ -129,6 +135,10 @@ if __name__ == '__main__':
 
         if histo_dict[histo_key].InheritsFrom('TH3'):
            WARNING(log_prx+'input histogram inherits from TH3 (not supported), will be skipped')
+           continue
+
+        if opts.name_only:
+           print '\033[1m'+'\033[92m'+'['+str(histo_dict[histo_key].ClassName())+']'+'\033[0m', histo_key
            continue
 
         isTH2 = histo_dict[histo_key].InheritsFrom('TH2')
