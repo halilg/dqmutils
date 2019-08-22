@@ -123,8 +123,8 @@ if __name__ == '__main__':
         elif os.path.isfile(i_inputf):
            i_inputf = 'file:'+os.path.abspath(i_inputf)
 
-        elif not i_inputf.startswith('/store/'):
-           KILL(log_prx+'invalid path to target remote file (path does not start with "/store/"): '+i_inputf)
+#        elif not i_inputf.startswith('/store/'):
+#           KILL(log_prx+'invalid path to target remote file (path does not start with "/store/"): '+i_inputf)
 
         INPUT_FILES += [i_inputf]
 

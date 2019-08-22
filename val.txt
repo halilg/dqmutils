@@ -1,0 +1,45 @@
+
+reference:
+/RelValTTbar_13/CMSSW_10_2_5-PUpmx25ns_102X_upgrade2018_realistic_v15_ECAL-v1/GEN-SIM-RECO
+/RelValTTbarLepton_13/CMSSW_10_2_5-PU25ns_102X_upgrade2018_realistic_v15_ECAL-v1/GEN-SIM-RECO
+
+target:
+/RelValTTbar_13UP18/CMSSW_10_6_1-PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_hs-v1/FEVTDEBUGHLT
+/RelValTTbarLepton_13UP18/CMSSW_10_6_1-PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_hs-v1/FEVTDEBUGHLT
+
+
+
+-----------------------------------------------------------
+-----------------------------------------------------------
+hltInfo \
+root://cms-xrd-global.cern.ch//store/relval/CMSSW_10_6_1/RelValTTbarLepton_13UP18/FEVTDEBUGHLT/PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_hs-v1/20000/FE29CF87-60E1-6F43-8AB4-329555E79FA8.root
+
+process SIM (release CMSSW_10_6_1)
+   global tag: '106X_upgrade2018_realistic_v6'
+
+process DIGI2RAW (release CMSSW_10_6_1)
+   global tag: '106X_upgrade2018_realistic_v6'
+
+process HLT (release CMSSW_10_2_16_UL)
+   HLT menu:   '/frozen/2018/2e34/v3.2/HLT/V1'
+   global tag: '102X_upgrade2018_realistic_v15'
+
+process RECO (release CMSSW_10_6_1)
+   global tag: '106X_upgrade2018_realistic_v6'
+   global tag: ''
+-----------------------------------------------------------
+-----------------------------------------------------------
+hltInfo \
+root://cms-xrd-global.cern.ch//store/relval/CMSSW_10_2_5/RelValTTbarLepton_13/GEN-SIM-RECO/PU25ns_102X_upgrade2018_realistic_v15_ECAL-v1/10000/70714D33-0F39-354C-BAD2-4C7420084BF6.root
+
+process SIM (release CMSSW_10_2_0)
+   global tag: '102X_upgrade2018_realistic_v9'
+
+process HLT (release CMSSW_10_2_5)
+   HLT menu:   '/frozen/2018/2e34/v3.2/HLT/V1'
+   global tag: '102X_upgrade2018_realistic_v15'
+
+process RECO (release CMSSW_10_2_5)
+   global tag: '102X_upgrade2018_realistic_v15'
+   global tag: ''
+-----------------------------------------------------------
