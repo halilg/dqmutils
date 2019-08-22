@@ -7,8 +7,6 @@ target:
 /RelValTTbar_13UP18/CMSSW_10_6_1-PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_hs-v1/FEVTDEBUGHLT
 /RelValTTbarLepton_13UP18/CMSSW_10_6_1-PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_hs-v1/FEVTDEBUGHLT
 
-
-
 -----------------------------------------------------------
 -----------------------------------------------------------
 hltInfo \
