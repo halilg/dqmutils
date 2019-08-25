@@ -2,12 +2,12 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step1 --conditions auto:phase1_2018_realistic --customise Configuration/DataProcessing/Utils.addMonitoring --datatier DQMIO --era Run2_2018 --eventcontent DQM --filein /store/mc/RunIIAutumn18DRPremix/TTTo2L2Nu_HT500Njet7_TuneCP5_13TeV-powheg-pythia8/AODSIM/102X_upgrade2018_realistic_v15-v1/110000/985B45EF-B512-6C4E-AC93-BCB7A7DA80EB.root --fileout dqmjob_100_DQM.root --geometry DB:Extended --mc --nThreads 1 --no_exec --python_filename dqmjob_100_DQM_cfg.py --runUnscheduled --step DQM:offlineHLTSourceOnAOD -n 100
+# with command line options: step1 --conditions auto:phase1_2018_realistic --customise Configuration/DataProcessing/Utils.addMonitoring --datatier DQMIO --era Run2_2018 --eventcontent DQM --filein /store/relval/CMSSW_10_6_1/RelValTTbarLepton_13UP18/FEVTDEBUGHLT/PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_hs-v1/20000/1A05F6A1-AE1B-724C-B9E2-A081DE805133.root --fileout DQM_output.root --geometry DB:Extended --mc --nThreads 1 --no_exec --python_filename DQM_cfg.py --runUnscheduled --step DQM:offlineHLTSource4relval -n 100
 import FWCore.ParameterSet.Config as cms
 
-from Configuration.StandardSequences.Eras import eras
+from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
 
-process = cms.Process('DQM',eras.Run2_2018)
+process = cms.Process('DQM',Run2_2018)
 
 # import of standard configurations
 process.load('Configuration.StandardSequences.Services_cff')
@@ -17,20 +17,41 @@ process.load('Configuration.EventContent.EventContent_cff')
 process.load('SimGeneral.MixingModule.mixNoPU_cfi')
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
+process.load('DQMServices.Core.DQMStoreNonLegacy_cff')
 process.load('DQMOffline.Configuration.DQMOfflineMC_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_cff')
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(100),
+    output = cms.optional.untracked.allowed(cms.int32,cms.PSet)
 )
 
 # Input source
 process.source = cms.Source("PoolSource",
-    fileNames = cms.untracked.vstring('file:/nfs/dust/cms/user/missirol/test/dqmoffline_trigger/devel_workflow1/dqmutils/store/mc/RunIIAutumn18DRPremix/TTTo2L2Nu_HT500Njet7_TuneCP5_13TeV-powheg-pythia8/AODSIM/102X_upgrade2018_realistic_v15-v1/110000/985B45EF-B512-6C4E-AC93-BCB7A7DA80EB.root'),
+    fileNames = cms.untracked.vstring('/store/relval/CMSSW_10_6_1/RelValTTbarLepton_13UP18/FEVTDEBUGHLT/PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_hs-v1/20000/1A05F6A1-AE1B-724C-B9E2-A081DE805133.root'),
     secondaryFileNames = cms.untracked.vstring()
 )
 
-process.options = cms.untracked.PSet(wantSummary = cms.untracked.bool(True))
+process.options = cms.untracked.PSet(
+    FailPath = cms.untracked.vstring(),
+    IgnoreCompletely = cms.untracked.vstring(),
+    Rethrow = cms.untracked.vstring(),
+    SkipEvent = cms.untracked.vstring(),
+    allowUnscheduled = cms.obsolete.untracked.bool,
+    canDeleteEarly = cms.untracked.vstring(),
+    emptyRunLumiMode = cms.obsolete.untracked.string,
+    fileMode = cms.untracked.string('FULLMERGE'),
+    forceEventSetupCacheClearOnNewRun = cms.untracked.bool(False),
+    makeTriggerResults = cms.obsolete.untracked.bool,
+    numberOfConcurrentLuminosityBlocks = cms.untracked.uint32(1),
+    numberOfConcurrentRuns = cms.untracked.uint32(1),
+    numberOfStreams = cms.untracked.uint32(0),
+    numberOfThreads = cms.untracked.uint32(1),
+    printDependencies = cms.untracked.bool(False),
+    sizeOfStackForThreadsInKB = cms.optional.untracked.uint32,
+    throwIfIllegalParameter = cms.untracked.bool(True),
+    wantSummary = cms.untracked.bool(False)
+)
 
 # Production Info
 process.configurationMetadata = cms.untracked.PSet(
@@ -46,7 +67,7 @@ process.DQMoutput = cms.OutputModule("DQMRootOutputModule",
         dataTier = cms.untracked.string('DQMIO'),
         filterName = cms.untracked.string('')
     ),
-    fileName = cms.untracked.string('dqmjob_100_DQM.root'),
+    fileName = cms.untracked.string('DQM_output.root'),
     outputCommands = process.DQMEventContent.outputCommands,
     splitLevel = cms.untracked.int32(0)
 )
@@ -58,8 +79,8 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2018_realistic', '')
 
 # Path and EndPath definitions
-process.dqmoffline_step = cms.EndPath(process.offlineHLTSourceOnAOD)
-process.dqmofflineOnPAT_step = cms.EndPath(process.offlineHLTSourceOnAOD)
+process.dqmoffline_step = cms.EndPath(process.offlineHLTSource4relval)
+process.dqmofflineOnPAT_step = cms.EndPath(process.offlineHLTSource4relval)
 process.DQMoutput_step = cms.EndPath(process.DQMoutput)
 
 # Schedule definition
