@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step1 --conditions auto:phase1_2018_realistic --customise Configuration/DataProcessing/Utils.addMonitoring --datatier DQMIO --era Run2_2018 --eventcontent DQM --filein /store/relval/CMSSW_10_6_1/RelValTTbarLepton_13UP18/FEVTDEBUGHLT/PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_hs-v1/20000/1A05F6A1-AE1B-724C-B9E2-A081DE805133.root --fileout DQM_output.root --geometry DB:Extended --mc --nThreads 1 --no_exec --python_filename DQM_cfg.py --runUnscheduled --step DQM:offlineHLTSource4relval -n 100
+# with command line options: step1 --conditions auto:phase1_2018_realistic --customise Configuration/DataProcessing/Utils.addMonitoring --datatier DQMIO --era Run2_2018 --eventcontent DQM --filein /store/relval/CMSSW_10_6_1/RelValTTbarLepton_13UP18/FEVTDEBUGHLT/PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_hs-v1/20000/1A05F6A1-AE1B-724C-B9E2-A081DE805133.root --fileout DQM_output.root --geometry DB:Extended --mc --nThreads 1 --no_exec --python_filename DQM_cfg.py --runUnscheduled --step DQM:offlineHLTSource4specialPhysicsPD -n 100
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
@@ -79,8 +79,8 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2018_realistic', '')
 
 # Path and EndPath definitions
-process.dqmoffline_step = cms.EndPath(process.offlineHLTSource4relval)
-process.dqmofflineOnPAT_step = cms.EndPath(process.offlineHLTSource4relval)
+process.dqmoffline_step = cms.EndPath(process.offlineHLTSource4specialPhysicsPD)
+process.dqmofflineOnPAT_step = cms.EndPath(process.offlineHLTSource4specialPhysicsPD)
 process.DQMoutput_step = cms.EndPath(process.DQMoutput)
 
 # Schedule definition
