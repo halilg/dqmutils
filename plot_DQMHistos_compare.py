@@ -94,6 +94,24 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
     if not (h_targ.InheritsFrom('TH1F') or h_targ.InheritsFrom('TH1D')):
        return 1
 
+    if (h_targ.GetNbinsX() == h_refe.GetNbinsX()) and (h_targ.GetNbinsY() == h_refe.GetNbinsY()):
+       for i_bin in range(0, 2+(h_targ.GetNbinsX() * h_targ.GetNbinsY())):
+           i_bin_targ = h_targ.GetBinContent(i_bin)
+           i_bin_refe = h_refe.GetBinContent(i_bin)
+           if abs(i_bin_targ - i_bin_refe) > 1e-8:
+              print 'differs', output
+              break
+    else:
+       print 'differs', output
+
+##!!!!!!!
+#    output_basename_woExt = str(output)
+#    output_dirname = os.path.dirname(output_basename_woExt)
+#    if not os.path.isdir(output_dirname): EXE('mkdir -p '+output_dirname)
+#    print os.path.relpath(output_basename_woExt)
+#    return
+##!!!!!!!
+
     h_refe.SetBit(ROOT.TH1.kNoTitle)
     h_targ.SetBit(ROOT.TH1.kNoTitle)
 
@@ -352,7 +370,7 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output', required=True, action='store', default=None,
                         help='path to output directory')
 
-    parser.add_argument('--only-keys', dest='only_keys', nargs='+', default=['/HLT/', '/TOP/'],
+    parser.add_argument('--only-keys', dest='only_keys', nargs='+', default=[],
                         help='list of strings required to be in histogram key')
 
     parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['png'],

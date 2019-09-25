@@ -14,6 +14,9 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output', action='store', default=None, required=True,
                         help='path to output directory')
 
+    parser.add_argument('-c', '--cfg', dest='cmsRun_cfg_file', action='store', default=os.path.dirname(os.path.abspath(__file__))+'/DQM_cfg.py',
+                        help='path to configuration file to be processed by cmsRun')
+
     parser.add_argument('--no-harvesting', dest='no_harvesting', action='store_true', default=False,
                         help='skip Harvesting step')
 
@@ -39,16 +42,32 @@ if __name__ == '__main__':
        KILL(log_prx+'target path to output directory already exists [-o]: '+str(opts.output))
 
     OUTPUT_DIR = os.path.abspath(opts.output)
+
+    if not os.path.isfile(opts.cmsRun_cfg_file):
+       KILL(log_prx+'invalid path to configuration file to be processed by cmsRun [-c]: '+str(opts.cmsRun_cfg_file))
+
+    CMSRUN_CFG_FILE_DQM = os.path.abspath(opts.cmsRun_cfg_file)
     ### -------------------------
 
     cmds = [
 
       'mkdir -p '+OUTPUT_DIR,
       'cd '+OUTPUT_DIR,
-      'cmsRun '+os.path.dirname(os.path.abspath(__file__))+'/DQM_cfg.py',
+      'cp '+CMSRUN_CFG_FILE_DQM+' '+OUTPUT_DIR,
+      'cmsRun '+CMSRUN_CFG_FILE_DQM,
     ]
 
     if not opts.no_harvesting:
-       cmds += ['cmsRun '+os.path.dirname(os.path.abspath(__file__))+'/harvesting_cfg.py']
+
+       CMSRUN_CFG_FILE_HAR = os.path.dirname(os.path.abspath(__file__))+'/harvesting_cfg.py'
+
+       if not os.path.isfile(CMSRUN_CFG_FILE_HAR):
+          KILL(log_prx+'invalid path to configuration file to be processed by cmsRun (step: Harvesting): '+str(CMSRUN_CFG_FILE_HAR))
+
+       cmds += [
+
+         'cp '+CMSRUN_CFG_FILE_HAR+' '+OUTPUT_DIR,
+         'cmsRun '+CMSRUN_CFG_FILE_HAR,
+       ]
 
     EXE(' && '.join(cmds), verbose=opts.verbose, dry_run=opts.dry_run)
