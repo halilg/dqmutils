@@ -2,7 +2,7 @@
 # using: 
 # Revision: 1.19 
 # Source: /local/reps/CMSSW/CMSSW/Configuration/Applications/python/ConfigBuilder.py,v 
-# with command line options: step1 --conditions auto:phase1_2018_realistic --customise Configuration/DataProcessing/Utils.addMonitoring --datatier DQMIO --era Run2_2018 --eventcontent DQM --filein /store/relval/CMSSW_10_6_1/RelValTTbarLepton_13UP18/FEVTDEBUGHLT/PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_hs-v1/20000/1A05F6A1-AE1B-724C-B9E2-A081DE805133.root --fileout DQM_output.root --geometry DB:Extended --mc --nThreads 1 --no_exec --python_filename DQM_offlineHLTSource4relval_cfg.py --runUnscheduled --step DQM:offlineHLTSource4relval -n 100
+# with command line options: step1 --conditions auto:phase1_2018_realistic --customise Configuration/DataProcessing/Utils.addMonitoring --datatier DQMIO --era Run2_2018 --eventcontent DQM --filein /store/relval/CMSSW_10_6_1/RelValTTbarLepton_13UP18/FEVTDEBUGHLT/PUpmx25ns_106X_upgrade2018_realistic_v6_ul18hlt_premix_hs-v1/20000/1A05F6A1-AE1B-724C-B9E2-A081DE805133.root --fileout DQM_output.root --geometry DB:Extended --mc --nThreads 1 --no_exec --python_filename DQM_offlineHLTSource4relval_cfg.py --runUnscheduled --step DQM:offlineHLTSource4relval -n 100 --customise_commands process.load("DQM.HLTEvF.HLTSiStripMonitoring_cff")\nprocess.SiStripClusterChargeCutNone = cms.PSet(value = cms.double(-1.0))\nprocess.load("RecoPixelVertexing.PixelLowPtUtilities.ClusterShapeHitFilterESProducer_cfi")\n
 import FWCore.ParameterSet.Config as cms
 
 from Configuration.Eras.Era_Run2_2018_cff import Run2_2018
@@ -79,11 +79,6 @@ from Configuration.AlCa.GlobalTag import GlobalTag
 process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:phase1_2018_realistic', '')
 
 # Path and EndPath definitions
-
-# modification to remove sequence that cause a crash on FEVTDEBUGHLT input
-process.offlineHLTSource4relval.remove(process.sistripMonitorHLTsequence)
-process.offlineHLTSource4relval.remove(process.sipixelMonitorHLTsequence)
-
 process.dqmoffline_step = cms.EndPath(process.offlineHLTSource4relval)
 process.dqmofflineOnPAT_step = cms.EndPath(process.offlineHLTSource4relval)
 process.DQMoutput_step = cms.EndPath(process.DQMoutput)
@@ -108,6 +103,10 @@ process=convertToUnscheduled(process)
 
 
 # Customisation from command line
+
+process.load("DQM.HLTEvF.HLTSiStripMonitoring_cff")
+process.SiStripClusterChargeCutNone = cms.PSet(value = cms.double(-1.0))
+process.load("RecoPixelVertexing.PixelLowPtUtilities.ClusterShapeHitFilterESProducer_cfi")
 
 # Add early deletion of temporary data products to reduce peak memory need
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
