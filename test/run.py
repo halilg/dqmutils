@@ -17,6 +17,9 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--cfg', dest='cmsRun_cfg_file', action='store', default=os.path.dirname(os.path.abspath(__file__))+'/DQM_cfg.py',
                         help='path to configuration file to be processed by cmsRun')
 
+    parser.add_argument('--cfg-harvesting', dest='cmsRun_cfg_file_harvesting', action='store', default=os.path.dirname(os.path.abspath(__file__))+'/harvesting_cfg.py',
+                        help='path to HARVESTING configuration file to be processed by cmsRun')
+
     parser.add_argument('--no-harvesting', dest='no_harvesting', action='store_true', default=False,
                         help='skip Harvesting step')
 
@@ -59,7 +62,7 @@ if __name__ == '__main__':
 
     if not opts.no_harvesting:
 
-       CMSRUN_CFG_FILE_HAR = os.path.dirname(os.path.abspath(__file__))+'/harvesting_cfg.py'
+       CMSRUN_CFG_FILE_HAR = os.path.abspath(opts.cmsRun_cfg_file_harvesting)
 
        if not os.path.isfile(CMSRUN_CFG_FILE_HAR):
           KILL(log_prx+'invalid path to configuration file to be processed by cmsRun (step: Harvesting): '+str(CMSRUN_CFG_FILE_HAR))
