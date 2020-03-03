@@ -24,7 +24,7 @@
     "--customise": "Configuration/DataProcessing/Utils.addMonitoring",
     "--era": "Run2_2016",
     "--mc": "",
-    "--conditions": "auto:phase1_2016_realistic"
+    "--conditions": "auto:run2_mc"
   },
 
   "AOD.MC.2017.0": {
