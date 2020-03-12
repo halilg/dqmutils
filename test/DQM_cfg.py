@@ -108,3 +108,48 @@ process=convertToUnscheduled(process)
 from Configuration.StandardSequences.earlyDeleteSettings_cff import customiseEarlyDelete
 process = customiseEarlyDelete(process)
 # End adding early deletion
+
+### manual additions
+
+process.MessageLogger = cms.Service('MessageLogger',
+  destinations = cms.untracked.vstring(
+    'cerr',
+    'logError',
+    'logInfo',
+    'logDebug',
+  ),
+  # scram b USER_CXXFLAGS="-DEDM_ML_DEBUG"
+  debugModules = cms.untracked.vstring(
+    'hltFiltersDQM',
+  ),
+  categories = cms.untracked.vstring(
+    'FwkReport',
+  ),
+  cerr = cms.untracked.PSet(
+    threshold = cms.untracked.string('WARNING'),
+    FwkReport = cms.untracked.PSet(
+      reportEvery = cms.untracked.int32(1),
+    ),
+  ),
+  logError = cms.untracked.PSet(
+    threshold = cms.untracked.string('ERROR'),
+    extension = cms.untracked.string('.txt'),
+    FwkReport = cms.untracked.PSet(
+      reportEvery = cms.untracked.int32(1),
+    ),
+  ),
+  logInfo = cms.untracked.PSet(
+    threshold = cms.untracked.string('INFO'),
+    extension = cms.untracked.string('.txt'),
+    FwkReport = cms.untracked.PSet(
+      reportEvery = cms.untracked.int32(1),
+    ),
+  ),
+  logDebug = cms.untracked.PSet(
+    threshold = cms.untracked.string('DEBUG'),
+    extension = cms.untracked.string('.txt'),
+    FwkReport = cms.untracked.PSet(
+      reportEvery = cms.untracked.int32(1),
+    ),
+  ),
+)

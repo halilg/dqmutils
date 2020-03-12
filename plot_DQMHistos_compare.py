@@ -95,14 +95,22 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
        return 1
 
     if (h_targ.GetNbinsX() == h_refe.GetNbinsX()) and (h_targ.GetNbinsY() == h_refe.GetNbinsY()):
-       for i_bin in range(0, 2+(h_targ.GetNbinsX() * h_targ.GetNbinsY())):
+#!!       for i_bin in range(0, 2+(h_targ.GetNbinsX() * h_targ.GetNbinsY())):
+       for i_bin in range(1, 1+(h_targ.GetNbinsX() * h_targ.GetNbinsY())):
            i_bin_targ = h_targ.GetBinContent(i_bin)
            i_bin_refe = h_refe.GetBinContent(i_bin)
            if abs(i_bin_targ - i_bin_refe) > 1e-8:
               print 'differs', output
               break
+
+       if output.endswith('HcalNZS_HLT_HcalPhiSym'):
+          for i_bin in range(0, 2+(h_targ.GetNbinsX() * h_targ.GetNbinsY())):
+              print i_bin, h_refe.GetBinContent(i_bin), h_targ.GetBinContent(i_bin), h_refe.GetXaxis().GetBinLabel(i_bin), h_targ.GetXaxis().GetBinLabel(i_bin)
+
     else:
        print 'differs', output
+
+    return #!!
 
 ##!!!!!!!
 #    output_basename_woExt = str(output)
@@ -439,3 +447,5 @@ if __name__ == '__main__':
     for histo_key in histo_paths_common:
         plot_canvas(output=os.path.abspath(opts.output)+'/'+histo_key.replace(' ', '_'), target=histo_dict_target[histo_key], reference=histo_dict_refern[histo_key], **kwargs)
     ### -------------------
+    print histo_paths_onlyRefern
+    print histo_paths_onlyTarget
