@@ -53,5 +53,19 @@
     "--era": "Run2_2018",
     "--mc": "",
     "--conditions": "auto:phase1_2018_realistic"
+  },
+
+  "AOD.MC.2021.0": {
+
+    "--step": "DQM:offlineHLTSourceOnAOD",
+    "--eventcontent": "DQM",
+    "--datatier": "DQMIO",
+    "--geometry": "DB:Extended",
+    "--nThreads": "1",
+    "--runUnscheduled": "",
+    "--customise": "Configuration/DataProcessing/Utils.addMonitoring",
+    "--era": "Run3",
+    "--mc": "",
+    "--conditions": "auto:phase1_2021_realistic"
   }
 }
