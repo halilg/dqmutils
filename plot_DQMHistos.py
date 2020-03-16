@@ -105,7 +105,7 @@ if __name__ == '__main__':
     i_inptfile = ROOT.TFile.Open(opts.input)
     if (not i_inptfile) or i_inptfile.IsZombie() or i_inptfile.TestBit(ROOT.TFile.kRecovered): raise SystemExit(1)
 
-    for h_key in TH1_keys(i_inptfile, contains_all=ONLY_KEYS):
+    for h_key in TH1_keys(i_inptfile, contains_one=ONLY_KEYS):
 
         if h_key in histo_dict:
            KILL(log_prx+'input error -> key "'+h_key+'" already exists in histogram-dictionary')
