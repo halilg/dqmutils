@@ -146,10 +146,10 @@ if __name__ == '__main__':
     parser.add_argument('-w', '--workflow', dest='workflow', action='store', default=None, required=True,
                         help='name of cmsDriver.py workflow (options to be defined in .json file)')
 
-    parser.add_argument('--name', dest='name', action='store', default='dqmjob', required=False,
+    parser.add_argument('--name', dest='name', action='store', default='dqmjob',
                         help='prefix of output files\' names (example: [NAME]_[counter].[ext])')
 
-    parser.add_argument('--max-inputs', dest='max_inputs', action='store', type=int, default=-1, required=False,
+    parser.add_argument('-m', '--max-inputs', dest='max_inputs', action='store', type=int, default=-1,
                         help='maximum number of input files to be processed (if integer is negative, all files will be processed)')
 
 #    parser.add_argument('-s', '--step', dest='step', action='store', default=None, required=True,
@@ -158,7 +158,7 @@ if __name__ == '__main__':
 #    parser.add_argument('-e', '--era', dest='era', action='store', default=None, required=True, choices=['2016', '2017', '2018'],
 #                        help='path to executable file used in batch job(s)')
 
-    parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1, required=False,
+    parser.add_argument('-n', '--n-events', dest='n_events', action='store', type=int, default=-1,
                         help='maximum number of events per job (used as argument of "-n" option in cmsDriver.py)')
 
 #    parser.add_argument('--exe-format-input', dest='exe_format_input', action='store', default='root',
@@ -319,7 +319,10 @@ if __name__ == '__main__':
 
         i_SHELL_COMMANDS += [[cmsDriver_cmd]]
 
-        i_SHELL_COMMANDS += [['cmsRun '+i_OUTPUT_BASENAME_woExt+'_DQM_cfg.py']]
+        i_SHELL_COMMANDS += [['edmConfigDump '+i_OUTPUT_BASENAME_woExt+'_DQM_cfg.py'+' > '+i_OUTPUT_BASENAME_woExt+'_DQM_cfg_dump.py']]
+        i_SHELL_COMMANDS += [['sed -i "s|pfJetsEI|ak4PFJetsCHS|g" '+i_OUTPUT_BASENAME_woExt+'_DQM_cfg_dump.py']]
+
+        i_SHELL_COMMANDS += [['cmsRun '+i_OUTPUT_BASENAME_woExt+'_DQM_cfg_dump.py']]
         i_SHELL_COMMANDS += [['touch  '+i_OUTPUT_BASENAME_woExt+'.completed']]
 
         if opts.batch == 'htc':
