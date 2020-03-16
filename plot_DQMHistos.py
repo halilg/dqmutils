@@ -61,10 +61,10 @@ if __name__ == '__main__':
     parser.add_argument('-o', '--output', dest='output', required=True, action='store', default=None,
                         help='path to output directory')
 
-    parser.add_argument('--only-keys', dest='only_keys', nargs='+', default=['/HLT/', '/TOP/'],
+    parser.add_argument('--only-keys', dest='only_keys', nargs='+', default=['/HLT/Run summary/Filters/', '/HLT/Run summary/JME/', '/HLT/Run summary/TOP/'],
                         help='list of strings required to be in histogram key')
 
-    parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['png'],
+    parser.add_argument('-e', '--exts', dest='exts', nargs='+', default=['pdf', 'png'],
                         help='list of extension(s) for output file(s)')
 
     parser.add_argument('-n', '--name-only', dest='name_only', action='store_true', default=False,
@@ -145,15 +145,17 @@ if __name__ == '__main__':
 
         if isTH2: opt_draw = 'colz,text'
         else:
-           if histo_dict[histo_key].GetName().startswith('effic_'): opt_draw = 'pex0'
-           else: opt_draw = 'hist,e'
+           if histo_dict[histo_key].GetName().startswith('effic_') and ('/Filters/' not in histo_key):
+              opt_draw = 'pex0'
+           else:
+              opt_draw = 'hist,e'
 
         canvas = ROOT.TCanvas(histo_key, histo_key)
         canvas.SetTickx()
         canvas.SetTicky()
 
         if isTH2: canvas.SetGrid(0,0)
-        else    : canvas.SetGrid(1,1)
+        else: canvas.SetGrid(1,1)
 
         T = canvas.GetTopMargin()
         R = canvas.GetRightMargin()
@@ -163,8 +165,8 @@ if __name__ == '__main__':
         ROOT.TGaxis.SetExponentOffset(-L+.50*L, 0.03, 'y')
 
         txt1 = None
-        if   'denominator' in histo_dict[histo_key].GetTitle(): txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.15, 31, .025, '[Denominator]')
-        elif 'numerator'   in histo_dict[histo_key].GetTitle(): txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.15, 31, .025, '[Numerator]')
+        if 'denominator' in histo_dict[histo_key].GetTitle(): txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.15, 31, .025, '[Denominator]')
+        elif 'numerator' in histo_dict[histo_key].GetTitle(): txt1 = get_text(L+(1-R-L)*1.00, (1-T)+T*0.15, 31, .025, '[Numerator]')
 
         txt2 = None # get_text(L+(1-R-L)*0.05, B+(1-B-T)*.77, 13, .040, '')
 
