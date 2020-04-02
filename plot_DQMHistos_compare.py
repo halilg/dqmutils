@@ -72,6 +72,22 @@ def add_TH1_objects(filelist, contains_all=[], contains_one=[]):
         ROOT.gROOT.GetListOfFiles().Remove(i_inptfile)
         i_inptfile.Close()
 
+##!!!!!
+    for _tmp in th1_dict:
+
+        if th1_dict[_tmp].GetName().startswith('cpfilt_'):
+
+           h0 = th1_dict[_tmp].Clone()
+           h0.Sumw2()
+           h0.SetDirectory(0)
+
+           for i_bin in range(1, h0.GetNbinsX()+1):
+               th1_dict[_tmp].SetBinContent(i_bin, h0.GetBinContent(i_bin+1))
+               th1_dict[_tmp].SetBinError  (i_bin, h0.GetBinError  (i_bin+1))
+
+           th1_dict[_tmp].Divide(h0)
+##!!!!!
+
     return th1_dict
 
 def get_text(x1ndc_, y1ndc_, talign_, tsize_, text_):
@@ -453,13 +469,12 @@ if __name__ == '__main__':
 
     for histo_key in histo_paths_onlyTarget:
         plot_canvas(output=os.path.abspath(opts.output)+'/only_target/'+histo_key.replace(' ', '_'), target=histo_dict_target[histo_key], reference=None, **kwargs)
-        break #!!
+
     for histo_key in histo_paths_onlyRefern:
         plot_canvas(output=os.path.abspath(opts.output)+'/only_reference/'+histo_key.replace(' ', '_'), target=None, reference=histo_dict_refern[histo_key], **kwargs)
-        break #!!
+
     for histo_key in histo_paths_common:
         plot_canvas(output=os.path.abspath(opts.output)+'/'+histo_key.replace(' ', '_'), target=histo_dict_target[histo_key], reference=histo_dict_refern[histo_key], **kwargs)
-        break #!!
 
 #    print histo_paths_onlyRefern
 #    print histo_paths_onlyTarget
