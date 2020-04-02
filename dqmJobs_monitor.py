@@ -82,7 +82,7 @@ if __name__ == '__main__':
 
     for input_dir in INPUT_DIRS:
 
-        for path, subdirs, files in os.walk(input_dir):
+        for path, subdirs, files in os.walk(input_dir, followlinks=True):
 
             for name in files:
 
@@ -94,7 +94,8 @@ if __name__ == '__main__':
 
                    i_fout = os.path.splitext(i_finp)[0]+'.'+EXT_OUT
 
-                   if os.path.isfile(i_fout): FILES_COMPLETED += [os.path.abspath(i_fout)]
+                   if os.path.isfile(i_fout):
+                      FILES_COMPLETED += [os.path.abspath(i_fout)]
 
     counter_input     = len(FILES_INPUT)
     counter_completed = len(FILES_COMPLETED)

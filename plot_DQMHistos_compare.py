@@ -1,9 +1,14 @@
 #!/usr/bin/env python
-import argparse, os, ROOT
+import argparse
+import os
+import ROOT
 
 from common import *
 
 from plot_style import load_plot_style
+
+COLOR_REFE = 1
+COLOR_TARG = 2
 
 def TH1_keys(tdirectory, prefix='', contains_all=[], contains_one=[]):
 
@@ -39,7 +44,7 @@ def TH1_keys(tdirectory, prefix='', contains_all=[], contains_one=[]):
 
     return th1_keys
 
-def add_TH1_objects(filelist, contains_all):
+def add_TH1_objects(filelist, contains_all=[], contains_one=[]):
 
     th1_dict = {}
 
@@ -48,7 +53,7 @@ def add_TH1_objects(filelist, contains_all):
         i_inptfile = ROOT.TFile.Open(i_inputf_path)
         if (not i_inptfile) or i_inptfile.IsZombie() or i_inptfile.TestBit(ROOT.TFile.kRecovered): raise SystemExit(1)
 
-        for h_key in TH1_keys(i_inptfile, contains_all=contains_all):
+        for h_key in TH1_keys(i_inptfile, contains_all=contains_all, contains_one=contains_one):
 
             if h_key in th1_dict:
                KILL(log_prx+'input error -> key "'+h_key+'" already exists in histogram-dictionary')
@@ -78,7 +83,7 @@ def get_text(x1ndc_, y1ndc_, talign_, tsize_, text_):
 
     return txt
 
-def plot_canvas(target, reference, target_legend, reference_legend, output, output_extensions):
+def plot_canvas(target, reference, target_legend, reference_legend, target_color, reference_color, output, output_extensions):
 
     if (target != None) and (reference != None):
        if target.ClassName() != reference.ClassName():
@@ -124,16 +129,16 @@ def plot_canvas(target, reference, target_legend, reference_legend, output, outp
     h_refe.UseCurrentStyle()
     h_targ.UseCurrentStyle()
 
-    h_refe.SetMarkerColor(1)
+    h_refe.SetMarkerColor(reference_color)
     h_refe.SetMarkerSize(1)
     h_refe.SetMarkerStyle(20)
-    h_refe.SetLineColor(1)
+    h_refe.SetLineColor(reference_color)
     h_refe.SetLineWidth(2)
 
-    h_targ.SetMarkerColor(2)
+    h_targ.SetMarkerColor(target_color)
     h_targ.SetMarkerSize(1)
     h_targ.SetMarkerStyle(24)
-    h_targ.SetLineColor(2)
+    h_targ.SetLineColor(target_color)
     h_targ.SetLineWidth(2)
 
     opt_draw, opt_legd = 'hist,e', 'lep'
@@ -373,6 +378,12 @@ if __name__ == '__main__':
     parser.add_argument('--r-leg', dest='reference_legend', required=True, action='store', default='',
                         help='text describing reference file (text in legend entry)')
 
+    parser.add_argument('--t-col', dest='target_color', action='store', type=int, default=2,
+                        help='color of target distributions')
+
+    parser.add_argument('--r-col', dest='reference_color', action='store', type=int, default=1,
+                        help='color of reference distributions')
+
     parser.add_argument('-o', '--output', dest='output', required=True, action='store', default=None,
                         help='path to output directory')
 
@@ -408,15 +419,15 @@ if __name__ == '__main__':
     ONLY_KEYS = list(set(opts.only_keys))
 
     if len(ONLY_KEYS):
-       print '\n >>> will plot only TH1 objects containing all of the following strings in their internal path:', ONLY_KEYS, '\n'
+       print '\n >>> will plot only TH1 objects containing any of the following strings in their internal path:', ONLY_KEYS, '\n'
 
     if len(opts_unknown) > 0:
        KILL(log_prx+'unrecognized command-line arguments: '+str(opts_unknown))
     ### -------------------
 
     ### input histograms --
-    histo_dict_target = add_TH1_objects(filelist=opts.target   , contains_all=ONLY_KEYS)
-    histo_dict_refern = add_TH1_objects(filelist=opts.reference, contains_all=ONLY_KEYS)
+    histo_dict_target = add_TH1_objects(filelist=opts.target   , contains_one=ONLY_KEYS)
+    histo_dict_refern = add_TH1_objects(filelist=opts.reference, contains_one=ONLY_KEYS)
 
     ### output files (plots)
     load_plot_style()
@@ -433,17 +444,22 @@ if __name__ == '__main__':
 
       'reference_legend': str(opts.reference_legend),
 
+      'target_color': opts.target_color,
+
+      'reference_color': opts.reference_color,
+
       'output_extensions': EXTS,
     }
 
     for histo_key in histo_paths_onlyTarget:
         plot_canvas(output=os.path.abspath(opts.output)+'/only_target/'+histo_key.replace(' ', '_'), target=histo_dict_target[histo_key], reference=None, **kwargs)
-
+        break #!!
     for histo_key in histo_paths_onlyRefern:
         plot_canvas(output=os.path.abspath(opts.output)+'/only_reference/'+histo_key.replace(' ', '_'), target=None, reference=histo_dict_refern[histo_key], **kwargs)
-
+        break #!!
     for histo_key in histo_paths_common:
         plot_canvas(output=os.path.abspath(opts.output)+'/'+histo_key.replace(' ', '_'), target=histo_dict_target[histo_key], reference=histo_dict_refern[histo_key], **kwargs)
-    ### -------------------
-    print histo_paths_onlyRefern
-    print histo_paths_onlyTarget
+        break #!!
+
+#    print histo_paths_onlyRefern
+#    print histo_paths_onlyTarget
