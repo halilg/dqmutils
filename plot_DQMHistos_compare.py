@@ -72,21 +72,21 @@ def add_TH1_objects(filelist, contains_all=[], contains_one=[]):
         ROOT.gROOT.GetListOfFiles().Remove(i_inptfile)
         i_inptfile.Close()
 
-##!!!!!
-    for _tmp in th1_dict:
-
-        if th1_dict[_tmp].GetName().startswith('cpfilt_'):
-
-           h0 = th1_dict[_tmp].Clone()
-           h0.Sumw2()
-           h0.SetDirectory(0)
-
-           for i_bin in range(1, h0.GetNbinsX()+1):
-               th1_dict[_tmp].SetBinContent(i_bin, h0.GetBinContent(i_bin+1))
-               th1_dict[_tmp].SetBinError  (i_bin, h0.GetBinError  (i_bin+1))
-
-           th1_dict[_tmp].Divide(h0)
-##!!!!!
+###!!!!!
+#    for _tmp in th1_dict:
+#
+#        if th1_dict[_tmp].GetName().startswith('cpfilt_'):
+#
+#           h0 = th1_dict[_tmp].Clone()
+#           h0.Sumw2()
+#           h0.SetDirectory(0)
+#
+#           for i_bin in range(1, h0.GetNbinsX()+1):
+#               th1_dict[_tmp].SetBinContent(i_bin, h0.GetBinContent(i_bin+1))
+#               th1_dict[_tmp].SetBinError  (i_bin, h0.GetBinError  (i_bin+1))
+#
+#           th1_dict[_tmp].Divide(h0)
+###!!!!!
 
     return th1_dict
 
@@ -158,15 +158,16 @@ def plot_canvas(target, reference, target_legend, reference_legend, target_color
     h_targ.SetLineWidth(2)
 
     opt_draw, opt_legd = 'hist,e', 'lep'
-    if h_refe.GetName().startswith('effic_'): opt_draw, opt_legd = 'pex0', 'pex0'
+    if h_refe.GetName().startswith('effic_') and ('/Filters/' not in output):
+       opt_draw, opt_legd = 'pex0', 'pex0'
 
     ratio = True
 
     logY = False
 
     histo_type = None
-    if   'numerator'   in h_refe.GetTitle(): histo_type = 'NUM'
-    elif 'denominator' in h_refe.GetTitle(): histo_type = 'DEN'
+    if   'numerator'   in h_refe.GetName(): histo_type = 'NUM'
+    elif 'denominator' in h_refe.GetName(): histo_type = 'DEN'
 
     # normalize (numerator, denominator) histograms to unity
     if histo_type in ['NUM', 'DEN']:
